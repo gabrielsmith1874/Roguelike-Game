@@ -1,0 +1,116 @@
+{
+  "enemies": [
+    {
+      "id": "slime",
+      "name": "Slime",
+      "description": "A basic blob creature",
+      "health": 30,
+      "damage": 8,
+      "speed": 40,
+      "behavior": "melee",
+      "detectionRadius": 120,
+      "attackRange": 16,
+      "attackCooldown": 1000,
+      "spriteKey": "enemy_slime",
+      "loot": {
+        "gold": { "min": 1, "max": 5 },
+        "dropChance": 0.1
+      }
+    },
+    {
+      "id": "skeleton",
+      "name": "Skeleton",
+      "description": "Reanimated bones wielding a sword",
+      "health": 45,
+      "damage": 12,
+      "speed": 60,
+      "behavior": "melee",
+      "detectionRadius": 150,
+      "attackRange": 24,
+      "attackCooldown": 800,
+      "spriteKey": "enemy_skeleton",
+      "loot": {
+        "gold": { "min": 3, "max": 8 },
+        "dropChance": 0.15
+      }
+    },
+    {
+      "id": "imp",
+      "name": "Fire Imp",
+      "description": "A small demon that hurls fireballs",
+      "health": 25,
+      "damage": 15,
+      "speed": 50,
+      "behavior": "ranged",
+      "detectionRadius": 180,
+      "attackRange": 120,
+      "attackCooldown": 1500,
+      "projectileId": "imp_fireball",
+      "spriteKey": "enemy_imp",
+      "element": "fire",
+      "loot": {
+        "gold": { "min": 5, "max": 12 },
+        "dropChance": 0.2
+      }
+    },
+    {
+      "id": "ghost",
+      "name": "Ghost",
+      "description": "An ethereal spirit that phases through walls",
+      "health": 35,
+      "damage": 10,
+      "speed": 45,
+      "behavior": "circling",
+      "detectionRadius": 200,
+      "attackRange": 40,
+      "attackCooldown": 1200,
+      "spriteKey": "enemy_ghost",
+      "passesWalls": true,
+      "loot": {
+        "gold": { "min": 8, "max": 15 },
+        "dropChance": 0.25
+      }
+    },
+    {
+      "id": "golem",
+      "name": "Stone Golem",
+      "description": "A slow but powerful stone construct",
+      "health": 150,
+      "damage": 30,
+      "speed": 25,
+      "behavior": "charging",
+      "detectionRadius": 100,
+      "attackRange": 32,
+      "attackCooldown": 2000,
+      "spriteKey": "enemy_golem",
+      "element": "earth",
+      "loot": {
+        "gold": { "min": 15, "max": 25 },
+        "dropChance": 0.4
+      }
+    }
+  ],
+  "bosses": [
+    {
+      "id": "boss_flame_lord",
+      "name": "Flame Lord",
+      "description": "Master of fire magic",
+      "health": 500,
+      "damage": 25,
+      "speed": 50,
+      "behavior": "boss_pattern",
+      "phases": 3,
+      "spriteKey": "boss_flame_lord",
+      "element": "fire",
+      "attacks": [
+        { "type": "fireball_spread", "cooldown": 2000 },
+        { "type": "flame_wave", "cooldown": 5000 },
+        { "type": "meteor_rain", "cooldown": 10000, "phase": 2 }
+      ],
+      "loot": {
+        "guaranteed": ["spell_meteor"],
+        "gold": { "min": 100, "max": 200 }
+      }
+    }
+  ]
+}

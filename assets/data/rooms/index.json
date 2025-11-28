@@ -1,0 +1,275 @@
+{
+  "rooms": [
+    {
+      "id": "start_basic",
+      "name": "Basic Start Room",
+      "type": "start",
+      "width": 9,
+      "height": 9,
+      "sizeCategory": "medium",
+      "doorSlots": [
+        { "direction": "north", "position": 0.5, "required": true },
+        { "direction": "east", "position": 0.5, "required": false },
+        { "direction": "south", "position": 0.5, "required": false },
+        { "direction": "west", "position": 0.5, "required": false }
+      ],
+      "tiles": [
+        [1, 1, 1, 1, 2, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [2, 0, 0, 0, 7, 0, 0, 0, 2],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 2, 1, 1, 1, 1]
+      ],
+      "spawns": [],
+      "difficulty": 0,
+      "weight": 1
+    },
+    {
+      "id": "normal_small_1",
+      "name": "Small Combat Room",
+      "type": "normal",
+      "width": 7,
+      "height": 7,
+      "sizeCategory": "small",
+      "doorSlots": [
+        { "direction": "north", "position": 0.5, "required": false },
+        { "direction": "south", "position": 0.5, "required": false },
+        { "direction": "east", "position": 0.5, "required": false },
+        { "direction": "west", "position": 0.5, "required": false }
+      ],
+      "tiles": [
+        [1, 1, 1, 2, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 6, 0, 6, 0, 1],
+        [2, 0, 0, 0, 0, 0, 2],
+        [1, 0, 6, 0, 6, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 2, 1, 1, 1]
+      ],
+      "spawns": [
+        { "x": 2, "y": 2, "type": "enemy", "weight": 1 },
+        { "x": 4, "y": 2, "type": "enemy", "weight": 1 },
+        { "x": 2, "y": 4, "type": "enemy", "weight": 0.5 },
+        { "x": 4, "y": 4, "type": "enemy", "weight": 0.5 }
+      ],
+      "difficulty": 1,
+      "weight": 3
+    },
+    {
+      "id": "normal_medium_pillars",
+      "name": "Pillar Room",
+      "type": "normal",
+      "width": 11,
+      "height": 9,
+      "sizeCategory": "medium",
+      "doorSlots": [
+        { "direction": "north", "position": 0.5, "required": false },
+        { "direction": "south", "position": 0.5, "required": false },
+        { "direction": "east", "position": 0.5, "required": false },
+        { "direction": "west", "position": 0.5, "required": false }
+      ],
+      "tiles": [
+        [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1],
+        [1, 0, 0, 0, 6, 0, 6, 0, 0, 0, 1],
+        [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+        [1, 0, 0, 0, 6, 0, 6, 0, 0, 0, 1],
+        [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]
+      ],
+      "spawns": [
+        { "x": 4, "y": 3, "type": "enemy", "weight": 1 },
+        { "x": 6, "y": 3, "type": "enemy", "weight": 1 },
+        { "x": 4, "y": 5, "type": "enemy", "weight": 1 },
+        { "x": 6, "y": 5, "type": "enemy", "weight": 1 }
+      ],
+      "difficulty": 2,
+      "weight": 2
+    },
+    {
+      "id": "normal_large_arena",
+      "name": "Large Arena",
+      "type": "normal",
+      "width": 13,
+      "height": 11,
+      "sizeCategory": "large",
+      "doorSlots": [
+        { "direction": "north", "position": 0.5, "required": false },
+        { "direction": "south", "position": 0.5, "required": false },
+        { "direction": "east", "position": 0.5, "required": false },
+        { "direction": "west", "position": 0.5, "required": false }
+      ],
+      "tiles": [
+        [1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+        [1, 0, 0, 0, 0, 6, 0, 6, 0, 0, 0, 0, 1],
+        [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+        [1, 0, 0, 0, 0, 6, 0, 6, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1]
+      ],
+      "spawns": [
+        { "x": 5, "y": 4, "type": "enemy", "weight": 1 },
+        { "x": 7, "y": 4, "type": "enemy", "weight": 1 },
+        { "x": 5, "y": 6, "type": "enemy", "weight": 1 },
+        { "x": 7, "y": 6, "type": "enemy", "weight": 1 },
+        { "x": 6, "y": 5, "type": "enemy", "weight": 0.5 }
+      ],
+      "difficulty": 3,
+      "weight": 1
+    },
+    {
+      "id": "normal_corridor_h",
+      "name": "Horizontal Corridor",
+      "type": "normal",
+      "width": 13,
+      "height": 5,
+      "sizeCategory": "small",
+      "doorSlots": [
+        { "direction": "east", "position": 0.5, "required": true },
+        { "direction": "west", "position": 0.5, "required": true }
+      ],
+      "tiles": [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [2, 0, 0, 6, 0, 0, 0, 0, 0, 6, 0, 0, 2],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+      ],
+      "spawns": [
+        { "x": 3, "y": 2, "type": "enemy", "weight": 1 },
+        { "x": 9, "y": 2, "type": "enemy", "weight": 1 }
+      ],
+      "difficulty": 1,
+      "weight": 2
+    },
+    {
+      "id": "normal_corridor_v",
+      "name": "Vertical Corridor",
+      "type": "normal",
+      "width": 5,
+      "height": 13,
+      "sizeCategory": "small",
+      "doorSlots": [
+        { "direction": "north", "position": 0.5, "required": true },
+        { "direction": "south", "position": 0.5, "required": true }
+      ],
+      "tiles": [
+        [1, 1, 2, 1, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 6, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 6, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 1, 2, 1, 1]
+      ],
+      "spawns": [
+        { "x": 2, "y": 3, "type": "enemy", "weight": 1 },
+        { "x": 2, "y": 9, "type": "enemy", "weight": 1 }
+      ],
+      "difficulty": 1,
+      "weight": 2
+    },
+    {
+      "id": "treasure_small",
+      "name": "Treasure Room",
+      "type": "treasure",
+      "width": 7,
+      "height": 7,
+      "sizeCategory": "small",
+      "doorSlots": [
+        { "direction": "south", "position": 0.5, "required": true }
+      ],
+      "tiles": [
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 8, 0, 0, 0, 8, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 5, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 8, 0, 0, 0, 8, 1],
+        [1, 1, 1, 2, 1, 1, 1]
+      ],
+      "spawns": [
+        { "x": 3, "y": 3, "type": "chest", "weight": 1 }
+      ],
+      "difficulty": 0,
+      "weight": 1
+    },
+    {
+      "id": "shop_basic",
+      "name": "Shop",
+      "type": "shop",
+      "width": 9,
+      "height": 7,
+      "sizeCategory": "medium",
+      "doorSlots": [
+        { "direction": "south", "position": 0.5, "required": true }
+      ],
+      "tiles": [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 5, 0, 5, 0, 5, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 2, 1, 1, 1, 1]
+      ],
+      "spawns": [
+        { "x": 2, "y": 2, "type": "item", "weight": 1 },
+        { "x": 4, "y": 2, "type": "item", "weight": 1 },
+        { "x": 6, "y": 2, "type": "item", "weight": 1 }
+      ],
+      "difficulty": 0,
+      "weight": 1
+    },
+    {
+      "id": "boss_flame",
+      "name": "Flame Lord Arena",
+      "type": "boss",
+      "width": 15,
+      "height": 13,
+      "sizeCategory": "large",
+      "doorSlots": [
+        { "direction": "south", "position": 0.5, "required": true }
+      ],
+      "tiles": [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1]
+      ],
+      "spawns": [
+        { "x": 7, "y": 6, "type": "enemy", "entityId": "boss_flame_lord", "weight": 1 }
+      ],
+      "difficulty": 10,
+      "minFloor": 1,
+      "tags": ["fire_theme", "boss"],
+      "weight": 1
+    }
+  ]
+}

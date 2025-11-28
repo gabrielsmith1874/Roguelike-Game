@@ -1,0 +1,4 @@
+# Tilemap assets go here
+# - tileset.png (main dungeon tileset)
+# - tileset.json (Tiled tileset data)
+# - room_templates/ (pre-made room layouts)

@@ -1,0 +1,105 @@
+{
+  "items": [
+    {
+      "id": "health_potion",
+      "name": "Health Potion",
+      "description": "Restores 30 health",
+      "type": "consumable",
+      "rarity": "common",
+      "effect": {
+        "type": "heal",
+        "value": 30
+      },
+      "spriteKey": "item_health_potion",
+      "value": 25
+    },
+    {
+      "id": "mana_potion",
+      "name": "Mana Potion",
+      "description": "Restores 50 mana",
+      "type": "consumable",
+      "rarity": "common",
+      "effect": {
+        "type": "restore_mana",
+        "value": 50
+      },
+      "spriteKey": "item_mana_potion",
+      "value": 20
+    },
+    {
+      "id": "heart_container",
+      "name": "Heart Container",
+      "description": "Permanently increases max health by 20",
+      "type": "permanent",
+      "rarity": "rare",
+      "effect": {
+        "type": "max_health",
+        "value": 20
+      },
+      "spriteKey": "item_heart_container",
+      "value": 0
+    },
+    {
+      "id": "mana_crystal",
+      "name": "Mana Crystal",
+      "description": "Permanently increases max mana by 25",
+      "type": "permanent",
+      "rarity": "rare",
+      "effect": {
+        "type": "max_mana",
+        "value": 25
+      },
+      "spriteKey": "item_mana_crystal",
+      "value": 0
+    },
+    {
+      "id": "speed_boots",
+      "name": "Swift Boots",
+      "description": "Increases movement speed by 15%",
+      "type": "passive",
+      "rarity": "uncommon",
+      "effect": {
+        "type": "speed_modifier",
+        "value": 1.15
+      },
+      "spriteKey": "item_speed_boots",
+      "value": 75
+    },
+    {
+      "id": "fire_ring",
+      "name": "Ring of Flames",
+      "description": "Fire spells deal 20% more damage",
+      "type": "passive",
+      "rarity": "rare",
+      "effect": {
+        "type": "element_damage",
+        "element": "fire",
+        "value": 1.2
+      },
+      "spriteKey": "item_fire_ring",
+      "value": 150
+    },
+    {
+      "id": "cooldown_amulet",
+      "name": "Chrono Amulet",
+      "description": "Reduces spell cooldowns by 15%",
+      "type": "passive",
+      "rarity": "epic",
+      "effect": {
+        "type": "cooldown_reduction",
+        "value": 0.85
+      },
+      "spriteKey": "item_chrono_amulet",
+      "value": 250
+    },
+    {
+      "id": "key",
+      "name": "Dungeon Key",
+      "description": "Opens locked doors and chests",
+      "type": "key",
+      "rarity": "common",
+      "spriteKey": "item_key",
+      "value": 15
+    }
+  ]
+}
