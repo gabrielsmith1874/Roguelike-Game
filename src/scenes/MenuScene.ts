@@ -92,6 +92,11 @@ export class MenuScene extends BaseScene {
     super(SCENES.MENU);
   }
   
+  preload(): void {
+    // Load wizard character sprite
+    this.load.image('wizard-south', 'assets/sprites/player/rotations/south.png');
+  }
+  
   create(): void {
     super.create();
     
@@ -265,44 +270,65 @@ export class MenuScene extends BaseScene {
   private createMainMenu(): void {
     this.mainContainer = this.add.container(0, 0);
     
-    // Animated title
-    const title = this.add.text(GAME_WIDTH / 2, 120, 'ARCANE DEPTHS', {
+    // Create atmospheric background elements
+    this.createMainMenuBackground();
+    
+    // Game title with enhanced styling
+    const title = this.add.text(GAME_WIDTH / 2, 100, 'ARCANE DEPTHS', {
       fontFamily: 'Arial Black, Arial',
-      fontSize: '64px',
+      fontSize: '72px',
       color: '#ffffff',
       stroke: '#6366f1',
-      strokeThickness: 4,
+      strokeThickness: 6,
+      shadow: {
+        offsetX: 0,
+        offsetY: 0,
+        color: '#6366f1',
+        blur: 20,
+        stroke: true,
+        fill: true
+      }
     }).setOrigin(0.5);
     
-    // Title glow effect
+    // Enhanced title animation
     this.titleTween = this.tweens.add({
       targets: title,
-      alpha: { from: 0.8, to: 1 },
-      scaleX: { from: 1, to: 1.02 },
-      scaleY: { from: 1, to: 1.02 },
-      duration: 2000,
+      alpha: { from: 0.7, to: 1 },
+      scaleX: { from: 0.98, to: 1.02 },
+      scaleY: { from: 0.98, to: 1.02 },
+      duration: 2500,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut',
     });
     
-    // Subtitle
-    const subtitle = this.add.text(GAME_WIDTH / 2, 190, 'A Magic Roguelike Adventure', {
+    // Subtitle with gradient effect
+    const subtitle = this.add.text(GAME_WIDTH / 2, 170, 'A Magic Roguelike Adventure', {
       fontFamily: 'Arial',
-      fontSize: '20px',
+      fontSize: '24px',
       color: '#a855f7',
       fontStyle: 'italic',
+      shadow: {
+        offsetX: 0,
+        offsetY: 0,
+        color: '#a855f7',
+        blur: 10,
+        stroke: false,
+        fill: true
+      }
     }).setOrigin(0.5);
     
-    // Menu buttons
-    const buttonY = 280;
-    const spacing = 65;
+    // Redesigned menu layout with better spacing
+    const buttonY = 260;
+    const spacing = 70;
     
-    const playBtn = this.createStyledButton(GAME_WIDTH / 2, buttonY, 'PLAY', 0x6366f1, () => {
+    // Primary action button (larger, more prominent)
+    const playBtn = this.createEnhancedButton(GAME_WIDTH / 2, buttonY, 'START GAME', 0x22c55e, 320, 60, () => {
       this.showMenu('play');
     });
     
-    const dungeonsBtn = this.createStyledButton(GAME_WIDTH / 2, buttonY + spacing, 'DUNGEONS', 0x8b5cf6, () => {
+    // Secondary buttons in a more compact layout
+    const dungeonsBtn = this.createStyledButton(GAME_WIDTH / 2, buttonY + spacing + 10, 'DUNGEONS', 0x8b5cf6, () => {
       this.showMenu('dungeons');
     });
     
@@ -310,11 +336,12 @@ export class MenuScene extends BaseScene {
       this.showMenu('characters');
     });
     
-    const achievementsBtn = this.createStyledButton(GAME_WIDTH / 2, buttonY + spacing * 3, 'ACHIEVEMENTS', 0x7c3aed, () => {
+    // Tertiary buttons (smaller, less prominent)
+    const achievementsBtn = this.createCompactButton(GAME_WIDTH / 2 - 100, buttonY + spacing * 3, 'ACHIEVEMENTS', 0x7c3aed, () => {
       this.showMenu('achievements');
     });
     
-    const settingsBtn = this.createStyledButton(GAME_WIDTH / 2, buttonY + spacing * 4, 'SETTINGS', 0x5b21b6, () => {
+    const settingsBtn = this.createCompactButton(GAME_WIDTH / 2 + 100, buttonY + spacing * 3, 'SETTINGS', 0x5b21b6, () => {
       this.showMenu('settings');
     });
     
@@ -328,59 +355,285 @@ export class MenuScene extends BaseScene {
     this.mainContainer.add([title, subtitle, playBtn, dungeonsBtn, charactersBtn, achievementsBtn, settingsBtn, version]);
   }
   
+  /**
+   * Create atmospheric background elements for the play menu
+   */
+  private createPlayMenuBackground(): void {
+    // Floating magical particles for play menu
+    for (let i = 0; i < 6; i++) {
+      const particle = this.add.graphics();
+      const size = Phaser.Math.Between(1, 4);
+      const x = Phaser.Math.Between(100, GAME_WIDTH - 100);
+      const y = Phaser.Math.Between(100, GAME_HEIGHT - 100);
+      
+      particle.fillStyle(0xa855f7, 0.4);
+      particle.fillCircle(x, y, size);
+      
+      // Gentle floating animation
+      this.tweens.add({
+        targets: particle,
+        y: y + Phaser.Math.Between(-15, 15),
+        alpha: { from: 0.2, to: 0.6 },
+        duration: Phaser.Math.Between(4000, 7000),
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+      
+      this.playContainer.add(particle);
+    }
+  }
+  
+  /**
+   * Create atmospheric background elements for the main menu
+   */
+  private createMainMenuBackground(): void {
+    // Floating magical orbs
+    for (let i = 0; i < 8; i++) {
+      const orb = this.add.graphics();
+      const size = Phaser.Math.Between(2, 6);
+      const x = Phaser.Math.Between(50, GAME_WIDTH - 50);
+      const y = Phaser.Math.Between(50, GAME_HEIGHT - 50);
+      
+      orb.fillStyle(0x6366f1, 0.3);
+      orb.fillCircle(x, y, size);
+      
+      // Gentle floating animation
+      this.tweens.add({
+        targets: orb,
+        y: y + Phaser.Math.Between(-20, 20),
+        alpha: { from: 0.3, to: 0.7 },
+        duration: Phaser.Math.Between(3000, 6000),
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+      
+      this.mainContainer.add(orb);
+    }
+  }
+  
+  /**
+   * Create an enhanced primary button with glow effect
+   */
+  private createEnhancedButton(
+    x: number,
+    y: number,
+    text: string,
+    color: number,
+    width: number,
+    height: number,
+    callback: () => void
+  ): Phaser.GameObjects.Container {
+    const container = this.add.container(x, y);
+    
+    // Glow effect background
+    const glow = this.add.graphics();
+    glow.fillStyle(color, 0.2);
+    glow.fillRoundedRect(-width / 2 - 4, -height / 2 - 4, width + 8, height + 8, 10);
+    
+    // Button background
+    const bg = this.add.graphics();
+    const drawButton = (hover: boolean) => {
+      bg.clear();
+      bg.fillStyle(color, hover ? 0.9 : 0.7);
+      bg.fillRoundedRect(-width / 2, -height / 2, width, height, 10);
+      bg.lineStyle(3, color, 1);
+      bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 10);
+    };
+    drawButton(false);
+    
+    // Button text
+    const label = this.add.text(0, 0, text, {
+      fontFamily: 'Arial Black',
+      fontSize: '26px',
+      color: '#ffffff',
+      fontStyle: 'bold',
+    }).setOrigin(0.5);
+    
+    // Hit area
+    const hitArea = this.add.rectangle(0, 0, width, height, 0x000000, 0)
+      .setInteractive({ useHandCursor: true });
+    
+    hitArea.on('pointerover', () => {
+      drawButton(true);
+      label.setScale(1.05);
+      this.playUISound('hover');
+    });
+    
+    hitArea.on('pointerout', () => {
+      drawButton(false);
+      label.setScale(1);
+    });
+    
+    hitArea.on('pointerdown', () => {
+      this.playUISound('click');
+      this.tweens.add({
+        targets: container,
+        scaleX: 0.95,
+        scaleY: 0.95,
+        duration: 100,
+        yoyo: true,
+        onComplete: callback,
+      });
+    });
+    
+    container.add([glow, bg, label, hitArea]);
+    return container;
+  }
+  
+  /**
+   * Create a compact secondary button
+   */
+  private createCompactButton(
+    x: number,
+    y: number,
+    text: string,
+    color: number,
+    callback: () => void
+  ): Phaser.GameObjects.Container {
+    const container = this.add.container(x, y);
+    const width = 180;
+    const height = 40;
+    
+    // Button background
+    const bg = this.add.graphics();
+    const drawButton = (hover: boolean) => {
+      bg.clear();
+      bg.fillStyle(color, hover ? 0.7 : 0.3);
+      bg.fillRoundedRect(-width / 2, -height / 2, width, height, 6);
+      bg.lineStyle(2, color, 1);
+      bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 6);
+    };
+    drawButton(false);
+    
+    // Button text
+    const label = this.add.text(0, 0, text, {
+      fontFamily: 'Arial',
+      fontSize: '16px',
+      color: '#ffffff',
+      fontStyle: 'bold',
+    }).setOrigin(0.5);
+    
+    // Hit area
+    const hitArea = this.add.rectangle(0, 0, width, height, 0x000000, 0)
+      .setInteractive({ useHandCursor: true });
+    
+    hitArea.on('pointerover', () => {
+      drawButton(true);
+      label.setScale(1.05);
+      this.playUISound('hover');
+    });
+    
+    hitArea.on('pointerout', () => {
+      drawButton(false);
+      label.setScale(1);
+    });
+    
+    hitArea.on('pointerdown', () => {
+      this.playUISound('click');
+      this.tweens.add({
+        targets: container,
+        scaleX: 0.95,
+        scaleY: 0.95,
+        duration: 50,
+        yoyo: true,
+        onComplete: callback,
+      });
+    });
+    
+    container.add([bg, label, hitArea]);
+    return container;
+  }
+  
   // ===========================================================================
   // PLAY MENU (Start Game)
   // ===========================================================================
-  
   private createPlayMenu(): void {
     this.playContainer = this.add.container(0, 0);
     this.playContainer.setVisible(false);
     
-    const title = this.createMenuTitle('BEGIN YOUR JOURNEY');
+    // Add background elements for play menu
+    this.createPlayMenuBackground();
+
+    const centerX = GAME_WIDTH / 2;
+    const centerY = GAME_HEIGHT / 2;
+
+    const title = this.add.text(centerX, centerY - 120, 'BEGIN YOUR JOURNEY', {
+      fontFamily: 'Arial Black, Arial',
+      fontSize: '48px',
+      color: '#ffffff',
+      stroke: '#6366f1',
+      strokeThickness: 4,
+      shadow: {
+        offsetX: 0,
+        offsetY: 0,
+        color: '#6366f1',
+        blur: 15,
+        stroke: true,
+        fill: true
+      }
+    }).setOrigin(0.5);
     
-    // Show selected character and dungeon
-    const infoY = 80;
+    // Enhanced character and dungeon display
+    const infoY = centerY - 40;
     
-    const charLabel = this.add.text(GAME_WIDTH / 2, infoY, 'Character: Wizard', {
+    const charLabel = this.add.text(centerX, infoY, 'Character: Wizard', {
       fontFamily: 'Arial',
-      fontSize: '12px',
+      fontSize: '18px',
       color: '#a855f7',
-    }).setOrigin(0.5).setName('charLabel');
+      shadow: {
+        offsetX: 0,
+        offsetY: 0,
+        color: '#a855f7',
+        blur: 8,
+        stroke: false,
+        fill: true
+      }
+    }).setOrigin(0.5);
     
-    const dungeonLabel = this.add.text(GAME_WIDTH / 2, infoY + 18, 'Dungeon: The Depths', {
+    const dungeonLabel = this.add.text(centerX, infoY + 30, 'Dungeon: The Depths', {
       fontFamily: 'Arial',
-      fontSize: '12px',
-      color: '#6366f1',
+      fontSize: '18px',
+      color: '#8b5cf6',
+      shadow: {
+        offsetX: 0,
+        offsetY: 0,
+        color: '#8b5cf6',
+        blur: 8,
+        stroke: false,
+        fill: true
+      }
     }).setOrigin(0.5).setName('dungeonLabel');
     
     // Continue button (if run in progress)
     const saves = SaveManager.getInstance();
-    const continueY = 130;
-    
+    const continueY = centerY + 40;
     if (saves.hasRunInProgress()) {
-      const continueBtn = this.createStyledButton(GAME_WIDTH / 2, continueY, 'CONTINUE RUN', 0x22c55e, () => {
+      const continueBtn = this.createEnhancedButton(centerX, continueY, 'CONTINUE RUN', 0x22c55e, 280, 50, () => {
         this.startGame(true);
       });
       this.playContainer.add(continueBtn);
     }
     
-    // New run button
-    const newGameBtn = this.createStyledButton(
-      GAME_WIDTH / 2, 
-      saves.hasRunInProgress() ? continueY + 30 : continueY, 
+    // New run button - primary action
+    const newGameBtn = this.createEnhancedButton(
+      centerX, 
+      saves.hasRunInProgress() ? continueY + 70 : continueY, 
       'NEW RUN', 
       0x6366f1, 
+      280, 
+      50,
       () => {
         this.startGame(false);
       }
     );
     
-    // Back button
+    // Enhanced back button
     const backBtn = this.createBackButton(() => this.showMenu('main'));
     
     this.playContainer.add([title, charLabel, dungeonLabel, newGameBtn, backBtn]);
   }
-  
   // ===========================================================================
   // DUNGEONS MENU
   // ===========================================================================
@@ -459,12 +712,12 @@ export class MenuScene extends BaseScene {
     this.dungeonPortraits = [];
 
     // Layout: Left panel (dungeon list) + Right panel (details)
-    const leftPanelX = 180;
-    const rightPanelX = 560;
+    const leftPanelX = GAME_WIDTH / 2 - 190;
+    const rightPanelX = GAME_WIDTH / 2 + 190;
     const panelY = 280;
 
     // Left panel - Dungeon list
-    const leftPanelWidth = 200;
+    const leftPanelWidth = 180;
     const leftPanelHeight = 340;
     const leftPanel = this.add.graphics();
     leftPanel.fillStyle(0x0a0a1a, 0.9);
@@ -474,7 +727,7 @@ export class MenuScene extends BaseScene {
     this.dungeonsContainer.add(leftPanel);
 
     // Create dungeon list items
-    const listStartY = panelY - leftPanelHeight / 2 + 30;
+    const listStartY = panelY - leftPanelHeight / 2 + 40;
     const itemHeight = 75;
 
     dungeons.forEach((dungeon, index) => {
@@ -484,7 +737,7 @@ export class MenuScene extends BaseScene {
     });
 
     // Right panel - Details
-    const rightPanelWidth = 340;
+    const rightPanelWidth = 360;
     const rightPanelHeight = 340;
     this.dungeonDetailsContainer = this.add.container(rightPanelX, panelY);
 
@@ -530,7 +783,8 @@ export class MenuScene extends BaseScene {
       fontSize: '11px',
       color: '#9ca3af',
       wordWrap: { width: rightPanelWidth - 40 },
-      lineSpacing: 2,
+      lineSpacing: 3,
+      align: 'left',
     }).setName('dungeonLore');
 
     // Start button
@@ -597,7 +851,7 @@ export class MenuScene extends BaseScene {
 
   private createDungeonListItem(dungeon: DungeonInfo, x: number, y: number): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
-    const width = 170;
+    const width = 150;
     const height = 65;
     container.setData('dungeonId', dungeon.id);
 
@@ -631,13 +885,13 @@ export class MenuScene extends BaseScene {
     }).setOrigin(0.5);
 
     // Name and description
-    const name = this.add.text(-width / 2 + 52, -12, dungeon.name, {
+    const name = this.add.text(-width / 2 + 45, -12, dungeon.name, {
       fontFamily: 'Arial Black',
       fontSize: '12px',
       color: dungeon.unlocked ? '#ffffff' : '#666666',
     });
 
-    const desc = this.add.text(-width / 2 + 52, 4, dungeon.unlocked ? `${dungeon.floors} Floors` : 'Locked', {
+    const desc = this.add.text(-width / 2 + 45, 4, dungeon.unlocked ? `${dungeon.floors} Floors` : 'Locked', {
       fontFamily: 'Arial',
       fontSize: '10px',
       color: dungeon.unlocked ? '#9ca3af' : '#4b5563',
@@ -688,7 +942,7 @@ export class MenuScene extends BaseScene {
       const unlocked = data?.unlocked ?? false;
       const color = data?.color ?? 0x333333;
       const selected = id === dungeonId;
-      const width = 170;
+      const width = 150;
       const height = 65;
 
       bg.clear();
@@ -724,11 +978,12 @@ export class MenuScene extends BaseScene {
         statsContainer.removeAll(true);
         const rightPanelWidth = 340;
         let yOffset = 0;
+        const lineHeight = 18;
 
         dungeon.stats.forEach((stat) => {
           const [label, value] = stat.split(': ');
 
-          const labelText = this.add.text(-rightPanelWidth / 2 + 20, yOffset, label, {
+          const labelText = this.add.text(-rightPanelWidth / 2 + 20, yOffset, label + ':', {
             fontFamily: 'Arial',
             fontSize: '11px',
             color: '#9ca3af',
@@ -740,9 +995,9 @@ export class MenuScene extends BaseScene {
 
           if (starCount > 0) {
             // Difficulty bar
-            const barWidth = 80;
+            const barWidth = 60;
             const barHeight = 8;
-            const barX = 70;
+            const barX = 40;
 
             const barBg = this.add.graphics();
             barBg.fillStyle(0x1f2937, 1);
@@ -755,15 +1010,16 @@ export class MenuScene extends BaseScene {
 
             statsContainer.add([barBg, barFill]);
           } else {
-            const valueText = this.add.text(70, yOffset, value, {
+            const valueText = this.add.text(40, yOffset, value, {
               fontFamily: 'Arial',
               fontSize: '11px',
               color: '#e5e7eb',
+              wordWrap: { width: 140 },
             });
             statsContainer.add(valueText);
           }
 
-          yOffset += 20;
+          yOffset += lineHeight;
         });
       }
     };
@@ -927,6 +1183,13 @@ export class MenuScene extends BaseScene {
       color: '#ffffff',
     }).setOrigin(0.5).setName('charArtIcon');
 
+    // Character sprite (for wizard, hidden by default)
+    const artSprite = this.add.image(leftColX + artSize / 2, -20, 'wizard-south')
+      .setOrigin(0.5)
+      .setScale(4.5) // Scale up for detail panel (32px * 4.5 = 144px)
+      .setVisible(false)
+      .setName('charArtSprite');
+
     // Lore below art (left column)
     const loreLabel = this.add.text(leftColX, artSize / 2 - 10, 'Lore', {
       fontFamily: 'Arial Black',
@@ -977,6 +1240,7 @@ export class MenuScene extends BaseScene {
       panelBg,
       artFrame,
       artIcon,
+      artSprite,
       loreLabel,
       loreText,
       nameText,
@@ -1014,12 +1278,19 @@ export class MenuScene extends BaseScene {
     };
     drawFrame(char.id === this.selectedCharacter);
     
-    // Character icon (placeholder - first letter)
-    const icon = this.add.text(0, -6, char.unlocked ? char.name[0] : '?', {
-      fontFamily: 'Arial Black',
-      fontSize: '28px',
-      color: char.unlocked ? '#ffffff' : '#444444',
-    }).setOrigin(0.5);
+    // Character icon - use sprite for wizard, fallback to letter for others
+    let icon: Phaser.GameObjects.Image | Phaser.GameObjects.Text;
+    if (char.id === 'wizard' && char.unlocked && this.textures.exists('wizard-south')) {
+      icon = this.add.image(0, 0, 'wizard-south')
+        .setOrigin(0.5)
+        .setScale(2.5); // Scale up the 32x32 sprite to fit the portrait (80px)
+    } else {
+      icon = this.add.text(0, -6, char.unlocked ? char.name[0] : '?', {
+        fontFamily: 'Arial Black',
+        fontSize: '28px',
+        color: char.unlocked ? '#ffffff' : '#444444',
+      }).setOrigin(0.5);
+    }
     
     // Name below
     const name = this.add.text(0, size / 2 + 10, char.name, {
@@ -1095,6 +1366,7 @@ export class MenuScene extends BaseScene {
 
     // Detail panel elements
     const artIcon = this.characterDetailsContainer.getByName('charArtIcon') as Phaser.GameObjects.Text | null;
+    const artSprite = this.characterDetailsContainer.getByName('charArtSprite') as Phaser.GameObjects.Image | null;
     const nameText = this.characterDetailsContainer.getByName('charName') as Phaser.GameObjects.Text | null;
     const roleText = this.characterDetailsContainer.getByName('charRole') as Phaser.GameObjects.Text | null;
     const loreText = this.characterDetailsContainer.getByName('charLore') as Phaser.GameObjects.Text | null;
@@ -1102,9 +1374,15 @@ export class MenuScene extends BaseScene {
     const statsContainer = this.characterDetailsContainer.getByName('charStatsContainer') as Phaser.GameObjects.Container | null;
 
     const applyContent = () => {
+      // Show sprite for wizard, text placeholder for others
+      const hasSprite = character.id === 'wizard' && this.textures.exists('wizard-south');
       if (artIcon) {
         artIcon.setText(character.name[0]);
         artIcon.setColor('#ffffff');
+        artIcon.setVisible(!hasSprite);
+      }
+      if (artSprite) {
+        artSprite.setVisible(hasSprite);
       }
 
       if (nameText) {
