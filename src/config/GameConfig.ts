@@ -8,7 +8,7 @@ import { GAME_WIDTH, GAME_HEIGHT } from './Constants';
 import { SceneRegistry } from '@scenes/SceneRegistry';
 
 export const GameConfig: Phaser.Types.Core.GameConfig = {
-  type: Phaser.AUTO,
+  type: Phaser.WEBGL,
   parent: 'game-container',
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
@@ -26,6 +26,8 @@ export const GameConfig: Phaser.Types.Core.GameConfig = {
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: GAME_WIDTH,
+    height: GAME_HEIGHT,
   },
   
   scene: SceneRegistry.getAllScenes(),

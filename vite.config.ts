@@ -17,6 +17,7 @@ export default defineConfig({
       '@managers': path.resolve(__dirname, './src/managers'),
       '@utils': path.resolve(__dirname, './src/utils'),
       '@types': path.resolve(__dirname, './src/types'),
+      '@shaders': path.resolve(__dirname, './src/shaders'),
     },
   },
   server: {

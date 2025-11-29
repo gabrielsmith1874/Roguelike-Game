@@ -12,11 +12,11 @@
 // DISPLAY
 // =============================================================================
 
-/** Base game resolution width in pixels */
-export const GAME_WIDTH = 480;
+/** Base game resolution width in pixels (16:9 aspect ratio) */
+export const GAME_WIDTH = 1280;
 
-/** Base game resolution height in pixels */
-export const GAME_HEIGHT = 270;
+/** Base game resolution height in pixels (16:9 aspect ratio) */
+export const GAME_HEIGHT = 720;
 
 /** Tile size in pixels (16x16 pixel art style) */
 export const TILE_SIZE = 16;

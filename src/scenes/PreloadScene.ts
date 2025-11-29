@@ -114,8 +114,17 @@ export class PreloadScene extends Phaser.Scene {
     // Generated offline, stored in assets/audio/music/
     // =========================================================================
     
-    this.load.audio('music_menu', ['assets/audio/music/menu.ogg', 'assets/audio/music/menu.mp3']);
+    this.load.audio('music_menu', 'assets/audio/music/menu.mp3');
     // this.load.audio('music_dungeon1', ['assets/audio/music/dungeon_floor1.ogg', 'assets/audio/music/dungeon_floor1.mp3']);
+    
+    // =========================================================================
+    // AUDIO - UI SOUND EFFECTS
+    // =========================================================================
+    
+    this.load.audio('sfx_ui_click', 'assets/audio/sfx/ui_click.mp3');
+    this.load.audio('sfx_ui_hover', 'assets/audio/sfx/ui_hover.mp3');
+    this.load.audio('sfx_ui_back', 'assets/audio/sfx/ui_back.mp3');
+    this.load.audio('sfx_ui_start', 'assets/audio/sfx/ui_start.mp3');
     // this.load.audio('music_dungeon2', ['assets/audio/music/dungeon_floor2.ogg', 'assets/audio/music/dungeon_floor2.mp3']);
     // this.load.audio('music_boss', ['assets/audio/music/boss.ogg', 'assets/audio/music/boss.mp3']);
     // this.load.audio('music_victory', ['assets/audio/music/victory.ogg', 'assets/audio/music/victory.mp3']);

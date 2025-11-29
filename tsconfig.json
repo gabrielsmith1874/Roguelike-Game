@@ -29,7 +29,8 @@
       "@ui/*": ["src/ui/*"],
       "@managers/*": ["src/managers/*"],
       "@utils/*": ["src/utils/*"],
-      "@types/*": ["src/types/*"]
+      "@types/*": ["src/types/*"],
+      "@shaders/*": ["src/shaders/*"]
     }
   },
   "include": ["src/**/*.ts"],

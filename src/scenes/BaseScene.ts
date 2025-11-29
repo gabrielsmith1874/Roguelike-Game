@@ -6,6 +6,7 @@
 
 import Phaser from 'phaser';
 import { EventManager } from '@managers/EventManager';
+import { CRTPipeline } from '@shaders/CRTShader';
 
 /**
  * Abstract base scene that all game scenes should extend.
@@ -16,7 +17,10 @@ import { EventManager } from '@managers/EventManager';
  */
 export abstract class BaseScene extends Phaser.Scene {
   /** Reference to the global event manager */
-  protected events!: EventManager;
+  protected eventManager!: EventManager;
+  
+  /** CRT shader pipeline */
+  protected crtPipeline?: CRTPipeline;
   
   constructor(key: string) {
     super({ key });
@@ -27,7 +31,7 @@ export abstract class BaseScene extends Phaser.Scene {
    * Override in subclasses, but call super.init(data) first.
    */
   init(_data?: object): void {
-    this.events = EventManager.getInstance();
+    this.eventManager = EventManager.getInstance();
   }
   
   /**
@@ -43,7 +47,28 @@ export abstract class BaseScene extends Phaser.Scene {
    * Override in subclasses, but call super.create() first.
    */
   create(): void {
-    // Override in subclasses
+    // Apply CRT shader to the camera if WebGL is available
+    this.applyCRTEffect();
+  }
+  
+  /**
+   * Apply CRT shader effect to the main camera.
+   */
+  protected applyCRTEffect(): void {
+    if (this.game.renderer.type === Phaser.WEBGL) {
+      const renderer = this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
+      // Check if pipeline exists
+      const pipelineClass = renderer.pipelines.getPostPipeline('CRTPipeline');
+      if (pipelineClass) {
+        this.cameras.main.setPostPipeline('CRTPipeline');
+        this.crtPipeline = this.cameras.main.getPostPipeline('CRTPipeline') as CRTPipeline;
+        console.log('CRT Effect applied to camera');
+      } else {
+        console.warn('CRTPipeline not found - make sure it is registered');
+      }
+    } else {
+      console.warn('WebGL not available - CRT effect disabled');
+    }
   }
   
   /**

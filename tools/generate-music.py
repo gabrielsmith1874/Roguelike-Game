@@ -25,7 +25,7 @@ from pathlib import Path
 # Check dependencies
 try:
     import torch
-    from transformers import AutoProcessor, MusicgenForConditionalGeneration
+    from transformers import AutoProcessor, MusicgenForConditionalGeneration, MusicgenConfig
     import scipy.io.wavfile as wavfile
 except ImportError:
     print("Missing dependencies. Install with:")
@@ -33,7 +33,8 @@ except ImportError:
     sys.exit(1)
 
 # Output directory
-OUTPUT_DIR = Path(__file__).parent.parent / "assets" / "audio" / "music"
+# Output directory
+OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Music prompts for different game states
@@ -125,6 +126,9 @@ def main():
     model_name = "facebook/musicgen-small"
     
     try:
+        # Fix for transformers bug where config_class is incorrect
+        MusicgenForConditionalGeneration.config_class = MusicgenConfig
+        
         processor = AutoProcessor.from_pretrained(model_name)
         model = MusicgenForConditionalGeneration.from_pretrained(model_name)
         print(f"Loaded model: {model_name}")

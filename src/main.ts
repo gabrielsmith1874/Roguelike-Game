@@ -5,13 +5,27 @@
 
 import Phaser from 'phaser';
 import { GameConfig } from '@config/GameConfig';
+import { CRTPipeline } from '@shaders/CRTShader';
 
 /**
  * Initialize and start the game.
  * This is the single entry point for the entire application.
  */
 function startGame(): Phaser.Game {
-  const game = new Phaser.Game(GameConfig);
+  // Add CRT pipeline to config before creating game
+  const config = {
+    ...GameConfig,
+    callbacks: {
+      postBoot: (game: Phaser.Game) => {
+        if (game.renderer.type === Phaser.WEBGL) {
+          const renderer = game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
+          renderer.pipelines.addPostPipeline('CRTPipeline', CRTPipeline);
+        }
+      }
+    }
+  };
+  
+  const game = new Phaser.Game(config);
   
   // Store game reference globally for debugging (remove in production)
   if (import.meta.env.DEV) {
