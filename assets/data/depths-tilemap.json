@@ -1,0 +1,144 @@
+{
+  "name": "The Depths",
+  "description": "The starting hub area - a safe zone with healing fountain and shops",
+  "tileset": {
+    "image": "sprites/depths/tileset.png",
+    "metadata": "sprites/depths/tileset-metadata.json",
+    "tileWidth": 32,
+    "tileHeight": 32,
+    "columns": 4,
+    "rows": 4
+  },
+  "tileTypes": {
+    "0": {
+      "name": "floor",
+      "walkable": true,
+      "sprite": "tileset",
+      "tileIndex": 0,
+      "description": "Dark stone dungeon floor"
+    },
+    "1": {
+      "name": "wall",
+      "walkable": false,
+      "sprite": "tileset",
+      "tileIndex": 15,
+      "description": "Cracked stone wall with moss and glowing runes"
+    },
+    "2": {
+      "name": "door",
+      "walkable": true,
+      "sprite": "tileset",
+      "tileIndex": 0,
+      "interactable": true,
+      "type": "door",
+      "description": "Doorway passage"
+    },
+    "5": {
+      "name": "pedestal",
+      "walkable": false,
+      "sprite": "tileset",
+      "tileIndex": 1,
+      "description": "Stone pedestal"
+    },
+    "6": {
+      "name": "obstacle",
+      "walkable": false,
+      "sprite": "barrel",
+      "customSprite": "sprites/depths/barrel.png",
+      "description": "Wooden barrel"
+    },
+    "7": {
+      "name": "spawn_point",
+      "walkable": true,
+      "sprite": "tileset",
+      "tileIndex": 0,
+      "isSpawnPoint": true,
+      "description": "Player spawn location"
+    },
+    "8": {
+      "name": "torch",
+      "walkable": false,
+      "sprite": "torch",
+      "customSprite": "sprites/depths/torch.png",
+      "emitsLight": true,
+      "lightColor": "#4488ff",
+      "lightRadius": 96,
+      "description": "Magical blue torch"
+    },
+    "9": {
+      "name": "healing_fountain",
+      "walkable": false,
+      "sprite": "healing-fountain",
+      "customSprite": "sprites/depths/healing-fountain.png",
+      "interactable": true,
+      "type": "fountain",
+      "healAmount": "full",
+      "emitsLight": true,
+      "lightColor": "#00ccff",
+      "lightRadius": 128,
+      "description": "Magical healing fountain - restores health"
+    },
+    "10": {
+      "name": "shop_stall",
+      "walkable": false,
+      "sprite": "shop-stall",
+      "customSprite": "sprites/depths/shop-stall.png",
+      "interactable": true,
+      "type": "shop",
+      "description": "Merchant shop stall"
+    }
+  },
+  "objects": {
+    "healing_fountain": {
+      "sprite": "sprites/depths/healing-fountain.png",
+      "width": 64,
+      "height": 64,
+      "offsetX": -16,
+      "offsetY": -16,
+      "interactable": true,
+      "healOnInteract": true,
+      "cooldown": 0,
+      "singleUse": false,
+      "particleEffect": "healing_particles"
+    },
+    "shop_stall": {
+      "sprite": "sprites/depths/shop-stall.png",
+      "width": 96,
+      "height": 64,
+      "offsetX": -32,
+      "offsetY": -16,
+      "interactable": true,
+      "opensShopMenu": true
+    },
+    "barrel": {
+      "sprite": "sprites/depths/barrel.png",
+      "width": 32,
+      "height": 32,
+      "destructible": true,
+      "dropsLoot": true
+    },
+    "torch": {
+      "sprite": "sprites/depths/torch.png",
+      "width": 32,
+      "height": 48,
+      "offsetY": -8,
+      "animated": false,
+      "emitsLight": true
+    },
+    "chest": {
+      "sprite": "sprites/depths/chest.png",
+      "width": 32,
+      "height": 32,
+      "interactable": true,
+      "opensOnInteract": true,
+      "dropsLoot": true,
+      "singleUse": true
+    }
+  },
+  "ambience": {
+    "backgroundColor": "#1a1a2e",
+    "ambientLight": 0.3,
+    "fogColor": "#2a2a4e",
+    "music": "depths_hub_theme"
+  }
+}

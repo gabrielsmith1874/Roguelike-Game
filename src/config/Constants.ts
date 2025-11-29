@@ -18,8 +18,8 @@ export const GAME_WIDTH = 1280;
 /** Base game resolution height in pixels (16:9 aspect ratio) */
 export const GAME_HEIGHT = 720;
 
-/** Tile size in pixels (16x16 pixel art style) */
-export const TILE_SIZE = 16;
+/** Tile size in pixels (scaled 2x for visibility) */
+export const TILE_SIZE = 32;
 
 // =============================================================================
 // GAMEPLAY

@@ -68,8 +68,7 @@ export class MenuScene extends BaseScene {
   
   // Carousel state for arc dungeon selector
   private carouselOffset: number = 0;
-  private carouselDragging: boolean = false;
-  private carouselVelocity: number = 0;
+  private hoveredDungeonId: string | null = null;
   
   // Animation tweens
   // private titleTween?: Phaser.Tweens.Tween; // Assigned but not referenced after creation
@@ -1365,26 +1364,61 @@ export class MenuScene extends BaseScene {
             color: '#9ca3af',
           });
 
-          // Difficulty stars bar
+          // Hide the original star text if we're showing graphical stars
           if (label === 'Difficulty') {
-            const barWidth = 80;
-            const barHeight = 8;
-            const barX = xOffset + 70;
-            const barY = yOffset + 8;
+            valueText.setVisible(false);
+          }
 
-            const barBg = this.add.graphics();
-            barBg.fillStyle(0x374151, 0.5);
-            barBg.fillRoundedRect(barX, barY, barWidth, barHeight, 4);
-
+          // Enhanced star display for difficulty (no bar)
+          if (label === 'Difficulty') {
             const starCount = (value.match(/★/g) || []).length;
-            const maxStars = 5;
-            const fillWidth = (starCount / maxStars) * barWidth;
-
-            const barFill = this.add.graphics();
-            barFill.fillStyle(dungeon.color, 1);
-            barFill.fillRoundedRect(barX, barY, fillWidth, barHeight, 4);
-
-            statsContainer.add([barBg, barFill]);
+            const starSize = 14;
+            const starSpacing = 16;
+            const totalStarWidth = 5 * starSpacing - 2; // Total width of 5 stars
+            
+            // Calculate center of label text and center stars under it
+            const labelWidth = labelText.width;
+            const labelCenter = xOffset + labelWidth / 2;
+            const starX = labelCenter - totalStarWidth / 2 + starSpacing / 2; // Centered under label
+            const starY = yOffset + 20; // Adjusted to split the difference
+            
+            // Draw 5 stars with clear filled/empty distinction
+            for (let i = 0; i < 5; i++) {
+              const star = this.add.text(starX + i * starSpacing, starY, '★', {
+                fontFamily: 'Arial',
+                fontSize: `${starSize}px`,
+                color: i < starCount ? `#${dungeon.color.toString(16).padStart(6, '0')}` : '#374151',
+                shadow: {
+                  offsetX: 1,
+                  offsetY: 1,
+                  color: '#000000',
+                  blur: 2,
+                  stroke: false,
+                  fill: true
+                }
+              }).setOrigin(0.5);
+              
+              // Add glow effect for filled stars
+              if (i < starCount) {
+                const glow = this.add.text(starX + i * starSpacing, starY, '★', {
+                  fontFamily: 'Arial',
+                  fontSize: `${starSize}px`,
+                  color: `#${dungeon.color.toString(16).padStart(6, '0')}`,
+                  shadow: {
+                    offsetX: 0,
+                    offsetY: 0,
+                    color: `#${dungeon.color.toString(16).padStart(6, '0')}`,
+                    blur: 8,
+                    stroke: false,
+                    fill: true
+                  }
+                }).setOrigin(0.5).setAlpha(0.5);
+                
+                statsContainer.add(glow);
+              }
+              
+              statsContainer.add(star);
+            }
           }
 
           statsContainer.add([labelText, valueText]);
@@ -1999,7 +2033,7 @@ export class MenuScene extends BaseScene {
   }
   
   private createSlider(label: string, y: number, value: number, callback: (value: number) => void): Phaser.GameObjects.Container {
-    const container = this.add.container(GAME_WIDTH / 2, y);
+    const container = this.add.container(GAME_WIDTH / 2 - 50, y);
     const sliderWidth = 240;
     const trackHeight = 16;
     const knobSize = 12;
@@ -2096,7 +2130,7 @@ export class MenuScene extends BaseScene {
   }
   
   private createToggle(label: string, y: number, value: boolean): Phaser.GameObjects.Container {
-    const container = this.add.container(GAME_WIDTH / 2, y);
+    const container = this.add.container(GAME_WIDTH / 2 - 50, y);
     
     // Label
     const text = this.add.text(-200, 0, label, {
@@ -2344,8 +2378,6 @@ export class MenuScene extends BaseScene {
     
     // Store carousel state
     this.carouselOffset = 0;
-    this.carouselDragging = false;
-    this.carouselVelocity = 0;
     
     // Create arc path visualization
     const arcPath = this.add.graphics();
@@ -2435,6 +2467,7 @@ export class MenuScene extends BaseScene {
       hitArea.setDepth(200);
       
       hitArea.on('pointerover', () => {
+        this.hoveredDungeonId = dungeon.id;
         if (dungeon.id !== this.selectedDungeon) {
           this.drawArcNode(nodeBg, dungeon, nodeSize, false, true);
           this.playUISound('hover');
@@ -2442,12 +2475,14 @@ export class MenuScene extends BaseScene {
       });
       
       hitArea.on('pointerout', () => {
+        this.hoveredDungeonId = null;
         this.drawArcNode(nodeBg, dungeon, nodeSize, dungeon.id === this.selectedDungeon, false);
       });
       
       hitArea.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
         // Stop propagation to prevent drag zone from catching this
         pointer.event.stopPropagation();
+        this.hoveredDungeonId = null; // Clear hover state
         this.playUISound('click');
         this.scrollToCarouselIndex(container.getData('index') as number);
       });
@@ -2492,8 +2527,7 @@ export class MenuScene extends BaseScene {
     let startOffset = 0;
     
     dragZone.on('dragstart', (pointer: Phaser.Input.Pointer) => {
-      this.carouselDragging = true;
-      this.carouselVelocity = 0;
+      this.hoveredDungeonId = null; // Clear hover state when dragging starts
       startX = pointer.x;
       startOffset = this.carouselOffset;
     });
@@ -2506,9 +2540,7 @@ export class MenuScene extends BaseScene {
     });
     
     dragZone.on('dragend', (_pointer: Phaser.Input.Pointer) => {
-      this.carouselDragging = false;
       // Stop any momentum and snap immediately to nearest dungeon
-      this.carouselVelocity = 0;
       this.snapToNearestDungeon(count);
     });
     
@@ -2558,7 +2590,9 @@ export class MenuScene extends BaseScene {
       const nodeBg = node.getByName('nodeBg') as Phaser.GameObjects.Graphics;
       
       if (dungeon && nodeBg) {
-        this.drawArcNode(nodeBg, dungeon, 70, isCentered, false);
+        // Check if this dungeon is hovered
+        const isHovered = this.hoveredDungeonId === dungeon.id;
+        this.drawArcNode(nodeBg, dungeon, 70, isCentered, isHovered);
       }
       
       // Update selected dungeon when centered
@@ -2622,46 +2656,123 @@ export class MenuScene extends BaseScene {
   }
   
   /**
-   * Create central detail display
+   * Create central detail display with custom stone tablet design
    */
   private createCentralDetailDisplay(): void {
     const centerX = GAME_WIDTH / 2;
-    const centerY = 480; // Positioned below the arc carousel
+    const centerY = 500; // Better spacing from arc above
     
     this.dungeonDetailsContainer = this.add.container(centerX, centerY);
     
-    const panelWidth = 600;
-    const panelHeight = 140;
+    const panelWidth = 620;
+    const panelHeight = 160;
+    const cornerRadius = 8;
     
-    // Glass-morphism panel
-    const panel = this.add.graphics();
-    panel.fillStyle(0x0a0a1a, 0.7);
-    panel.fillRoundedRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight, 16);
-    panel.lineStyle(1, 0x4f46e5, 0.3);
-    panel.strokeRoundedRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight, 16);
+    // Main stone tablet background with gradient effect
+    const tablet = this.add.graphics();
     
-    // Dungeon name
-    const nameText = this.add.text(0, -panelHeight / 2 + 25, 'The Depths', {
+    // Outer shadow layer
+    tablet.fillStyle(0x000000, 0.6);
+    tablet.fillRoundedRect(-panelWidth/2 + 4, -panelHeight/2 + 4, panelWidth, panelHeight, cornerRadius);
+    
+    // Main tablet surface with stone texture gradient
+    tablet.fillStyle(0x1a1a2e, 0.95);
+    tablet.fillRoundedRect(-panelWidth/2, -panelHeight/2, panelWidth, panelHeight, cornerRadius);
+    
+    // Inner border highlight
+    tablet.lineStyle(2, 0x374151, 0.8);
+    tablet.strokeRoundedRect(-panelWidth/2 + 2, -panelHeight/2 + 2, panelWidth - 4, panelHeight - 4, cornerRadius - 1);
+    
+    // Outer ornate border
+    tablet.lineStyle(1, 0x6b7280, 0.6);
+    tablet.strokeRoundedRect(-panelWidth/2, -panelHeight/2, panelWidth, panelHeight, cornerRadius);
+    
+    // Decorative corner ornaments
+    this.drawCornerOrnament(tablet, -panelWidth/2 + 15, -panelHeight/2 + 15, 0x4f46e5);
+    this.drawCornerOrnament(tablet, panelWidth/2 - 15, -panelHeight/2 + 15, 0x4f46e5);
+    this.drawCornerOrnament(tablet, -panelWidth/2 + 15, panelHeight/2 - 15, 0x4f46e5);
+    this.drawCornerOrnament(tablet, panelWidth/2 - 15, panelHeight/2 - 15, 0x4f46e5);
+    
+    // Top decorative line
+    tablet.lineStyle(1, 0x4f46e5, 0.4);
+    tablet.beginPath();
+    tablet.moveTo(-panelWidth/2 + 40, -panelHeight/2 + 35);
+    tablet.lineTo(panelWidth/2 - 40, -panelHeight/2 + 35);
+    tablet.strokePath();
+    
+    // Bottom decorative line
+    tablet.beginPath();
+    tablet.moveTo(-panelWidth/2 + 40, panelHeight/2 - 35);
+    tablet.lineTo(panelWidth/2 - 40, panelHeight/2 - 35);
+    tablet.strokePath();
+    
+    // Dungeon name with custom styling
+    const nameText = this.add.text(0, -panelHeight/2 + 25, 'The Depths', {
       fontFamily: 'Arial Black',
-      fontSize: '20px',
-      color: '#ffffff',
+      fontSize: '22px',
+      color: '#f3f4f6',
+      fontStyle: 'bold',
+      shadow: {
+        offsetX: 2,
+        offsetY: 2,
+        color: '#000000',
+        blur: 3,
+        stroke: true,
+        fill: true
+      }
     }).setOrigin(0.5).setName('dungeonName');
     
-    // Lore text
+    // Lore text with better styling
     const loreText = this.add.text(0, 5, 'Dungeon lore...', {
-      fontFamily: 'Arial',
-      fontSize: '12px',
-      color: '#9ca3af',
-      wordWrap: { width: panelWidth - 40 },
-      lineSpacing: 2,
+      fontFamily: 'Georgia',
+      fontSize: '13px',
+      color: '#d1d5db',
+      fontStyle: 'italic',
+      wordWrap: { width: panelWidth - 60 },
+      lineSpacing: 4,
       align: 'center',
+      shadow: {
+        offsetX: 1,
+        offsetY: 1,
+        color: '#000000',
+        blur: 2,
+        stroke: false,
+        fill: true
+      }
     }).setOrigin(0.5).setName('dungeonLore');
     
-    // Stats container
-    const statsContainer = this.add.container(0, 40).setName('dungeonStatsContainer');
+    // Stats container with custom styling
+    const statsContainer = this.add.container(0, 45).setName('dungeonStatsContainer');
     
-    this.dungeonDetailsContainer.add([panel, nameText, loreText, statsContainer]);
+    // Add magical glow effect around the tablet
+    const glow = this.add.graphics();
+    glow.lineStyle(3, 0x4f46e5, 0.2);
+    glow.strokeRoundedRect(-panelWidth/2 - 2, -panelHeight/2 - 2, panelWidth + 4, panelHeight + 4, cornerRadius + 2);
+    
+    this.dungeonDetailsContainer.add([glow, tablet, nameText, loreText, statsContainer]);
     this.dungeonsContainer.add(this.dungeonDetailsContainer);
+  }
+  
+  /**
+   * Draw decorative corner ornament for the tablet
+   */
+  private drawCornerOrnament(graphics: Phaser.GameObjects.Graphics, x: number, y: number, color: number): void {
+    graphics.fillStyle(color, 0.6);
+    graphics.lineStyle(1, color, 0.8);
+    
+    // Draw a small decorative rune/symbol
+    graphics.beginPath();
+    graphics.moveTo(x - 8, y);
+    graphics.lineTo(x, y - 8);
+    graphics.lineTo(x + 8, y);
+    graphics.lineTo(x, y + 8);
+    graphics.closePath();
+    graphics.fillPath();
+    graphics.strokePath();
+    
+    // Add inner detail
+    graphics.fillStyle(color, 0.8);
+    graphics.fillCircle(x, y, 2);
   }
   
   /**

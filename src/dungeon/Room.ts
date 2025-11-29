@@ -24,6 +24,8 @@ export enum RoomType {
   SECRET = 'secret',
   /** Challenge room (harder enemies, better rewards) */
   CHALLENGE = 'challenge',
+  /** Hub room - safe zone with services (fountain, shop) */
+  HUB = 'hub',
 }
 
 /**

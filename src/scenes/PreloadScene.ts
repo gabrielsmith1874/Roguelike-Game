@@ -108,6 +108,20 @@ export class PreloadScene extends Phaser.Scene {
     this.load.json('spells', 'assets/data/spells.json');
     this.load.json('enemies', 'assets/data/enemies.json');
     this.load.json('items', 'assets/data/items.json');
+    this.load.json('depths-tilemap', 'assets/data/depths-tilemap.json');
+    
+    // =========================================================================
+    // DEPTHS TILESET AND OBJECTS
+    // =========================================================================
+    
+    // Tileset as spritesheet (4x4 grid of 16x16 tiles)
+    this.load.spritesheet('depths-tileset', 'assets/sprites/depths/tileset.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+        this.load.image('depths-torch', 'assets/sprites/depths/torch.png');
+    this.load.image('depths-barrel', 'assets/sprites/depths/barrel.png');
+    this.load.image('depths-chest', 'assets/sprites/depths/chest.png');
     
     // =========================================================================
     // AUDIO - MUSIC

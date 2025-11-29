@@ -1,0 +1,56 @@
+{
+  "name": "Depths Tileset",
+  "tileWidth": 16,
+  "tileHeight": 16,
+  "columns": 8,
+  "rows": 4,
+  "tiles": {
+    "floor": {
+      "indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "description": "Floor tile variations"
+    },
+    "wall": {
+      "indices": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "description": "Wall tile variations"
+    },
+    "transition": {
+      "indices": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "description": "Transition and special tiles"
+    }
+  }
+}
