@@ -4,6 +4,7 @@
       "id": "start_basic",
       "name": "Basic Start Room",
       "type": "start",
+      "zone": "catacombs",
       "width": 9,
       "height": 9,
       "sizeCategory": "medium",
@@ -32,6 +33,7 @@
       "id": "normal_small_1",
       "name": "Small Combat Room",
       "type": "normal",
+      "zone": "catacombs",
       "width": 7,
       "height": 7,
       "sizeCategory": "small",
@@ -63,6 +65,7 @@
       "id": "normal_medium_pillars",
       "name": "Pillar Room",
       "type": "normal",
+      "zone": "catacombs",
       "width": 11,
       "height": 9,
       "sizeCategory": "medium",
@@ -96,6 +99,7 @@
       "id": "normal_large_arena",
       "name": "Large Arena",
       "type": "normal",
+      "zone": "catacombs",
       "width": 13,
       "height": 11,
       "sizeCategory": "large",
@@ -190,6 +194,7 @@
       "id": "treasure_small",
       "name": "Treasure Room",
       "type": "treasure",
+      "zone": "catacombs",
       "width": 7,
       "height": 7,
       "sizeCategory": "small",
@@ -275,6 +280,7 @@
       "id": "depths_hub",
       "name": "The Depths Hub",
       "type": "hub",
+      "zone": "catacombs",
       "width": 21,
       "height": 17,
       "sizeCategory": "large",
@@ -307,6 +313,98 @@
       "tags": ["depths", "hub", "safe_zone"],
       "weight": 1,
       "description": "The central hub of The Depths. A safe haven for weary adventurers to rest and prepare."
+    },
+    {
+      "id": "library_small",
+      "name": "Library Study",
+      "type": "normal",
+      "zone": "library",
+      "width": 9,
+      "height": 9,
+      "sizeCategory": "medium",
+      "doorSlots": [
+        { "direction": "north", "position": 0.5, "required": false },
+        { "direction": "south", "position": 0.5, "required": false },
+        { "direction": "east", "position": 0.5, "required": false },
+        { "direction": "west", "position": 0.5, "required": false }
+      ],
+      "tiles": [
+        [1, 1, 1, 1, 2, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 6, 0, 0, 0, 6, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [2, 0, 0, 0, 7, 0, 0, 0, 2],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 6, 0, 0, 0, 6, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 2, 1, 1, 1, 1]
+      ],
+      "spawns": [
+        { "x": 2, "y": 2, "type": "enemy", "weight": 1 },
+        { "x": 6, "y": 2, "type": "enemy", "weight": 1 }
+      ],
+      "difficulty": 2,
+      "weight": 2
+    },
+    {
+      "id": "crystal_small",
+      "name": "Crystal Chamber",
+      "type": "normal",
+      "zone": "crystal_caves",
+      "width": 7,
+      "height": 7,
+      "sizeCategory": "small",
+      "doorSlots": [
+        { "direction": "north", "position": 0.5, "required": false },
+        { "direction": "south", "position": 0.5, "required": false },
+        { "direction": "east", "position": 0.5, "required": false },
+        { "direction": "west", "position": 0.5, "required": false }
+      ],
+      "tiles": [
+        [1, 1, 1, 2, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 6, 0, 6, 0, 1],
+        [2, 0, 0, 0, 0, 0, 2],
+        [1, 0, 6, 0, 6, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 2, 1, 1, 1]
+      ],
+      "spawns": [
+        { "x": 3, "y": 3, "type": "enemy", "weight": 1 }
+      ],
+      "difficulty": 3,
+      "weight": 2
+    },
+    {
+      "id": "forge_small",
+      "name": "Forge Workshop",
+      "type": "normal",
+      "zone": "forge_depths",
+      "width": 9,
+      "height": 7,
+      "sizeCategory": "medium",
+      "doorSlots": [
+        { "direction": "north", "position": 0.5, "required": false },
+        { "direction": "south", "position": 0.5, "required": false },
+        { "direction": "east", "position": 0.5, "required": false },
+        { "direction": "west", "position": 0.5, "required": false }
+      ],
+      "tiles": [
+        [1, 1, 1, 1, 2, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 6, 0, 6, 0, 6, 0, 1],
+        [2, 0, 0, 0, 7, 0, 0, 0, 2],
+        [1, 0, 6, 0, 6, 0, 6, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 2, 1, 1, 1, 1]
+      ],
+      "spawns": [
+        { "x": 2, "y": 2, "type": "enemy", "weight": 1 },
+        { "x": 6, "y": 2, "type": "enemy", "weight": 1 },
+        { "x": 4, "y": 3, "type": "enemy", "weight": 0.5 }
+      ],
+      "difficulty": 4,
+      "weight": 2
     }
   ]
 }

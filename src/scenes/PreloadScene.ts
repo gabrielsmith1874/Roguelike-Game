@@ -114,12 +114,29 @@ export class PreloadScene extends Phaser.Scene {
     // DEPTHS TILESET AND OBJECTS
     // =========================================================================
     
-    // Tileset as spritesheet (4x4 grid of 16x16 tiles)
+    // Load all zone tilesets as spritesheets (4x4 grid of 16x16 tiles)
     this.load.spritesheet('depths-tileset', 'assets/sprites/depths/tileset.png', {
       frameWidth: 16,
       frameHeight: 16,
     });
-        this.load.image('depths-torch', 'assets/sprites/depths/torch.png');
+    this.load.spritesheet('catacombs-tileset', 'assets/sprites/depths/catacombs-tileset.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet('library-tileset', 'assets/sprites/depths/library-tileset.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet('crystal_caves-tileset', 'assets/sprites/depths/crystal_caves-tileset.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet('forge_depths-tileset', 'assets/sprites/depths/forge_depths-tileset.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    
+    this.load.image('depths-torch', 'assets/sprites/depths/torch.png');
     this.load.image('depths-barrel', 'assets/sprites/depths/barrel.png');
     this.load.image('depths-chest', 'assets/sprites/depths/chest.png');
     
