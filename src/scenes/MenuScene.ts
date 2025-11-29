@@ -46,8 +46,8 @@ export class MenuScene extends BaseScene {
   private achievementsContainer!: Phaser.GameObjects.Container;
   private settingsContainer!: Phaser.GameObjects.Container;
   
-  // Current state
-  private currentState: MenuState = 'main';
+  // Current state (assigned but never read - kept for potential future state management)
+  // private currentState: MenuState = 'main';
   
   // Background particles
   private particles: Phaser.GameObjects.Graphics[] = [];
@@ -66,8 +66,13 @@ export class MenuScene extends BaseScene {
   private dungeonDetailsContainer!: Phaser.GameObjects.Container;
   private dungeonData: DungeonInfo[] = [];
   
+  // Carousel state for arc dungeon selector
+  private carouselOffset: number = 0;
+  private carouselDragging: boolean = false;
+  private carouselVelocity: number = 0;
+  
   // Animation tweens
-  private titleTween?: Phaser.Tweens.Tween;
+  // private titleTween?: Phaser.Tweens.Tween; // Assigned but not referenced after creation
   
   // Hover sound cooldown
   private lastHoverTime: number = 0;
@@ -161,7 +166,8 @@ export class MenuScene extends BaseScene {
   private setupAudioUnlock(): void {
     // Resume audio context on first click anywhere
     this.input.once('pointerdown', () => {
-      if (this.sound.context?.state === 'suspended') {
+      // Check if sound manager has context (not NoAudioSoundManager)
+      if ('context' in this.sound && this.sound.context?.state === 'suspended') {
         this.sound.context.resume();
       }
       // Try playing music again after unlock
@@ -291,7 +297,7 @@ export class MenuScene extends BaseScene {
     }).setOrigin(0.5);
     
     // Enhanced title animation
-    this.titleTween = this.tweens.add({
+    this.tweens.add({
       targets: title,
       alpha: { from: 0.7, to: 1 },
       scaleX: { from: 0.98, to: 1.02 },
@@ -359,22 +365,40 @@ export class MenuScene extends BaseScene {
    * Create atmospheric background elements for the play menu
    */
   private createPlayMenuBackground(): void {
-    // Floating magical particles for play menu
-    for (let i = 0; i < 6; i++) {
+    // Create smooth mystical gradient
+    const gradient = this.add.graphics();
+    // Use smoother color transitions to avoid banding
+    gradient.fillGradientStyle(0x2d1b69, 0x2d1b69, 0x1e1b4b, 0x1e1b4b, 0.5);
+    gradient.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    
+    // Add second gradient layer for smoother transition
+    const gradient2 = this.add.graphics();
+    gradient2.fillGradientStyle(0x1e1b4b, 0x312e81, 0x312e81, 0x1e1b4b, 0.4);
+    gradient2.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    
+    this.playContainer.add([gradient, gradient2]);
+    
+    // Energy particles with trails
+    for (let i = 0; i < 15; i++) {
       const particle = this.add.graphics();
-      const size = Phaser.Math.Between(1, 4);
-      const x = Phaser.Math.Between(100, GAME_WIDTH - 100);
-      const y = Phaser.Math.Between(100, GAME_HEIGHT - 100);
+      const size = Phaser.Math.Between(2, 5);
+      const x = Phaser.Math.Between(50, GAME_WIDTH - 50);
+      const y = Phaser.Math.Between(50, GAME_HEIGHT - 50);
+      const color = Phaser.Math.RND.pick([0xa855f7, 0x8b5cf6, 0x7c3aed]);
       
-      particle.fillStyle(0xa855f7, 0.4);
+      // Particle with glow
+      particle.fillStyle(color, 0.1);
+      particle.fillCircle(x, y, size * 1.5);
+      particle.fillStyle(color, 0.6);
       particle.fillCircle(x, y, size);
       
-      // Gentle floating animation
+      // Complex movement pattern
       this.tweens.add({
         targets: particle,
-        y: y + Phaser.Math.Between(-15, 15),
-        alpha: { from: 0.2, to: 0.6 },
-        duration: Phaser.Math.Between(4000, 7000),
+        y: y + Phaser.Math.Between(-40, 40),
+        x: x + Phaser.Math.Between(-20, 20),
+        alpha: { from: 0.2, to: 0.8 },
+        duration: Phaser.Math.Between(3000, 6000),
         yoyo: true,
         repeat: -1,
         ease: 'Sine.easeInOut'
@@ -382,34 +406,382 @@ export class MenuScene extends BaseScene {
       
       this.playContainer.add(particle);
     }
+    
+    // Floating geometric patterns
+    for (let i = 0; i < 8; i++) {
+      const pattern = this.add.graphics();
+      const x = Phaser.Math.Between(80, GAME_WIDTH - 80);
+      const y = Phaser.Math.Between(80, GAME_HEIGHT - 80);
+      const size = Phaser.Math.Between(10, 20);
+      const color = Phaser.Math.RND.pick([0xa855f7, 0x8b5cf6]);
+      
+      // Create geometric pattern instead of emoticon
+      pattern.lineStyle(1, color, 0.3);
+      pattern.strokeCircle(0, 0, size);
+      
+      // Inner geometric pattern
+      for (let j = 0; j < 4; j++) {
+        const angle = (j / 4) * Math.PI * 2;
+        pattern.beginPath();
+        pattern.moveTo(0, 0);
+        pattern.lineTo(Math.cos(angle) * size * 0.7, Math.sin(angle) * size * 0.7);
+        pattern.strokePath();
+      }
+      
+      pattern.setPosition(x, y);
+      pattern.setAlpha(0.3);
+      
+      // Floating and rotating
+      this.tweens.add({
+        targets: pattern,
+        y: y - Phaser.Math.Between(20, 40),
+        alpha: { from: 0.1, to: 0.4 },
+        angle: 360,
+        duration: Phaser.Math.Between(8000, 12000),
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+      
+      this.playContainer.add(pattern);
+    }
+    
+    // Add subtle aurora effect
+    const aurora = this.add.graphics();
+    aurora.fillGradientStyle(0xa855f7, 0x8b5cf6, 0x7c3aed, 0xa855f7, 0.1);
+    aurora.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT / 3);
+    
+    this.tweens.add({
+      targets: aurora,
+      alpha: { from: 0.05, to: 0.15 },
+      duration: 6000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+    
+    this.playContainer.add(aurora);
   }
   
   /**
    * Create atmospheric background elements for the main menu
    */
   private createMainMenuBackground(): void {
-    // Floating magical orbs
-    for (let i = 0; i < 8; i++) {
+    // Create smooth gradient background overlay
+    const gradient = this.add.graphics();
+    // Use smoother color transitions to avoid banding
+    gradient.fillGradientStyle(0x1a1a2e, 0x1a1a2e, 0x16213e, 0x16213e, 0.6);
+    gradient.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    
+    // Add second gradient layer for smoother transition
+    const gradient2 = this.add.graphics();
+    gradient2.fillGradientStyle(0x16213e, 0x0f3460, 0x0f3460, 0x16213e, 0.4);
+    gradient2.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    
+    this.mainContainer.add([gradient, gradient2]);
+    
+    // Add mystical star field
+    for (let i = 0; i < 50; i++) {
+      const star = this.add.graphics();
+      const x = Phaser.Math.Between(0, GAME_WIDTH);
+      const y = Phaser.Math.Between(0, GAME_HEIGHT);
+      const size = Phaser.Math.Between(0.5, 2);
+      const twinkle = Phaser.Math.FloatBetween(0.3, 1);
+      
+      star.fillStyle(0xffffff, twinkle);
+      star.fillCircle(x, y, size);
+      
+      // Twinkling animation
+      this.tweens.add({
+        targets: star,
+        alpha: { from: twinkle * 0.5, to: twinkle },
+        duration: Phaser.Math.Between(1000, 3000),
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+      
+      this.mainContainer.add(star);
+    }
+    
+    // Floating magical orbs with different colors
+    const orbColors = [0x6366f1, 0xa855f7, 0x8b5cf6, 0x7c3aed];
+    for (let i = 0; i < 12; i++) {
       const orb = this.add.graphics();
-      const size = Phaser.Math.Between(2, 6);
+      const size = Phaser.Math.Between(3, 8);
       const x = Phaser.Math.Between(50, GAME_WIDTH - 50);
       const y = Phaser.Math.Between(50, GAME_HEIGHT - 50);
+      const color = Phaser.Math.RND.pick(orbColors);
       
-      orb.fillStyle(0x6366f1, 0.3);
+      // Create glow effect
+      orb.fillStyle(color, 0.1);
+      orb.fillCircle(x, y, size * 2);
+      orb.fillStyle(color, 0.3);
       orb.fillCircle(x, y, size);
       
-      // Gentle floating animation
+      // Complex floating animation
       this.tweens.add({
         targets: orb,
-        y: y + Phaser.Math.Between(-20, 20),
-        alpha: { from: 0.3, to: 0.7 },
-        duration: Phaser.Math.Between(3000, 6000),
+        y: y + Phaser.Math.Between(-30, 30),
+        x: x + Phaser.Math.Between(-15, 15),
+        alpha: { from: 0.3, to: 0.8 },
+        duration: Phaser.Math.Between(4000, 8000),
         yoyo: true,
         repeat: -1,
         ease: 'Sine.easeInOut'
       });
       
       this.mainContainer.add(orb);
+    }
+    
+    // Add magical geometric patterns
+    for (let i = 0; i < 6; i++) {
+      const pattern = this.add.graphics();
+      const x = Phaser.Math.Between(100, GAME_WIDTH - 100);
+      const y = Phaser.Math.Between(100, GAME_HEIGHT - 100);
+      const size = Phaser.Math.Between(12, 20);
+      const color = orbColors[i % orbColors.length];
+      
+      // Create geometric pattern instead of emoticon
+      pattern.lineStyle(1, color, 0.3);
+      pattern.strokeCircle(0, 0, size);
+      
+      // Inner star pattern
+      for (let j = 0; j < 8; j++) {
+        const angle = (j / 8) * Math.PI * 2;
+        pattern.beginPath();
+        pattern.moveTo(0, 0);
+        pattern.lineTo(Math.cos(angle) * size * 0.8, Math.sin(angle) * size * 0.8);
+        pattern.strokePath();
+      }
+      
+      // Outer decorative ring
+      pattern.strokeCircle(0, 0, size * 1.2);
+      
+      pattern.setPosition(x, y);
+      pattern.setAlpha(0.2);
+      
+      // Slow rotation and fade
+      this.tweens.add({
+        targets: pattern,
+        alpha: { from: 0.1, to: 0.3 },
+        angle: 360,
+        duration: Phaser.Math.Between(15000, 25000),
+        repeat: -1,
+        ease: 'Linear'
+      });
+      
+      this.mainContainer.add(pattern);
+    }
+    
+    // Create ethereal mist effect
+    const mist = this.add.graphics();
+    mist.fillStyle(0x6366f1, 0.05);
+    mist.fillCircle(GAME_WIDTH / 2, GAME_HEIGHT / 2, 300);
+    mist.fillCircle(GAME_WIDTH / 3, GAME_HEIGHT / 3, 200);
+    mist.fillCircle(GAME_WIDTH * 2/3, GAME_HEIGHT * 2/3, 250);
+    
+    this.tweens.add({
+      targets: mist,
+      alpha: { from: 0.05, to: 0.15 },
+      scaleX: { from: 1, to: 1.1 },
+      scaleY: { from: 1, to: 1.1 },
+      duration: 8000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+  
+    this.mainContainer.add(mist);
+  }
+  
+  /**
+   * Create atmospheric background elements for the dungeons menu
+   */
+  private createImmersiveDungeonBackground(): void {
+    // Create multi-layered parallax background
+    const bg1 = this.add.graphics();
+    bg1.fillGradientStyle(0x0f0f23, 0x0f0f23, 0x1a1a2e, 0x1a1a2e, 1);
+    bg1.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    
+    // Add atmospheric fog effect
+    const fog = this.add.graphics();
+    fog.fillGradientStyle(0x1a1a2e, 0x16213e, 0x16213e, 0x1a1a2e, 0.3);
+    fog.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    
+    // Create animated mystical particles
+    for (let i = 0; i < 20; i++) {
+      const particle = this.add.graphics();
+      const x = Phaser.Math.Between(0, GAME_WIDTH);
+      const y = Phaser.Math.Between(0, GAME_HEIGHT);
+      const size = Phaser.Math.FloatBetween(1, 3);
+      const color = Phaser.Math.RND.pick([0x6366f1, 0x8b5cf6, 0xa855f7, 0xc084fc]);
+      
+      particle.fillStyle(color, 0.6);
+      particle.fillCircle(0, 0, size);
+      particle.setPosition(x, y);
+      
+      // Floating animation
+      this.tweens.add({
+        targets: particle,
+        y: y - 50,
+        alpha: { from: 0.6, to: 0.1 },
+        duration: Phaser.Math.Between(3000, 6000),
+        ease: 'Sine.easeInOut',
+        yoyo: true,
+        repeat: -1,
+        delay: Phaser.Math.Between(0, 2000)
+      });
+      
+      this.dungeonsContainer.add(particle);
+    }
+    
+    // Add rotating magical symbols
+    for (let i = 0; i < 6; i++) {
+      const symbol = this.add.graphics();
+      const x = Phaser.Math.Between(100, GAME_WIDTH - 100);
+      const y = Phaser.Math.Between(100, GAME_HEIGHT - 100);
+      
+      symbol.lineStyle(1, 0x6366f1, 0.3);
+      symbol.strokeCircle(0, 0, 20);
+      symbol.strokeCircle(0, 0, 15);
+      
+      // Inner mystical pattern
+      for (let j = 0; j < 6; j++) {
+        const angle = (j / 6) * Math.PI * 2;
+        symbol.beginPath();
+        symbol.moveTo(0, 0);
+        symbol.lineTo(Math.cos(angle) * 10, Math.sin(angle) * 10);
+        symbol.strokePath();
+      }
+      
+      symbol.setPosition(x, y);
+      
+      // Slow rotation
+      this.tweens.add({
+        targets: symbol,
+        rotation: Math.PI * 2,
+        duration: Phaser.Math.Between(20000, 40000),
+        ease: 'Linear',
+        repeat: -1
+      });
+      
+      this.dungeonsContainer.add(symbol);
+    }
+    
+    this.dungeonsContainer.add([bg1, fog]);
+  }
+  
+  private createCharactersMenuBackground(): void {
+    // Magic-themed gradient
+    const gradient = this.add.graphics();
+    gradient.fillGradientStyle(0x2d1b69, 0x2d1b69, 0x1e1b4b, 0x1e1b4b, 0.5);
+    gradient.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    
+    const gradient2 = this.add.graphics();
+    gradient2.fillGradientStyle(0x1e1b4b, 0x312e81, 0x312e81, 0x1e1b4b, 0.4);
+    gradient2.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    
+    this.charactersContainer.add([gradient, gradient2]);
+    
+    // Add magical particles
+    for (let i = 0; i < 8; i++) {
+      const particle = this.add.graphics();
+      const x = Phaser.Math.Between(50, GAME_WIDTH - 50);
+      const y = Phaser.Math.Between(50, GAME_HEIGHT - 50);
+      const size = Phaser.Math.Between(2, 4);
+      const color = Phaser.Math.RND.pick([0xa855f7, 0x8b5cf6]);
+      
+      particle.fillStyle(color, 0.3);
+      particle.fillCircle(x, y, size);
+      
+      this.tweens.add({
+        targets: particle,
+        y: y + Phaser.Math.Between(-20, 20),
+        alpha: { from: 0.2, to: 0.5 },
+        duration: Phaser.Math.Between(4000, 7000),
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+      
+      this.charactersContainer.add(particle);
+    }
+  }
+  
+  /**
+   * Create atmospheric background elements for the achievements menu
+   */
+  private createAchievementsMenuBackground(): void {
+    // Golden achievement-themed gradient
+    const gradient = this.add.graphics();
+    gradient.fillGradientStyle(0x1a1a2e, 0x1a1a2e, 0x2d1b69, 0x2d1b69, 0.5);
+    gradient.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    
+    const gradient2 = this.add.graphics();
+    gradient2.fillGradientStyle(0x2d1b69, 0xfbbf24, 0xfbbf24, 0x2d1b69, 0.3);
+    gradient2.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    
+    this.achievementsContainer.add([gradient, gradient2]);
+    
+    // Add golden sparkles
+    for (let i = 0; i < 12; i++) {
+      const sparkle = this.add.graphics();
+      const x = Phaser.Math.Between(50, GAME_WIDTH - 50);
+      const y = Phaser.Math.Between(50, GAME_HEIGHT - 50);
+      const size = Phaser.Math.Between(1, 3);
+      
+      sparkle.fillStyle(0xfbbf24, 0.4);
+      sparkle.fillCircle(x, y, size);
+      
+      this.tweens.add({
+        targets: sparkle,
+        alpha: { from: 0.1, to: 0.6 },
+        duration: Phaser.Math.Between(2000, 4000),
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+      
+      this.achievementsContainer.add(sparkle);
+    }
+  }
+  
+  /**
+   * Create atmospheric background elements for the settings menu
+   */
+  private createSettingsMenuBackground(): void {
+    // Technical/cyber-themed gradient
+    const gradient = this.add.graphics();
+    gradient.fillGradientStyle(0x0f0f23, 0x0f0f23, 0x1e1b4b, 0x1e1b4b, 0.6);
+    gradient.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    
+    const gradient2 = this.add.graphics();
+    gradient2.fillGradientStyle(0x1e1b4b, 0x374151, 0x374151, 0x1e1b4b, 0.3);
+    gradient2.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    
+    this.settingsContainer.add([gradient, gradient2]);
+    
+    // Add tech particles
+    for (let i = 0; i < 6; i++) {
+      const particle = this.add.graphics();
+      const x = Phaser.Math.Between(50, GAME_WIDTH - 50);
+      const y = Phaser.Math.Between(50, GAME_HEIGHT - 50);
+      const size = Phaser.Math.Between(1, 2);
+      
+      particle.fillStyle(0x374151, 0.4);
+      particle.fillCircle(x, y, size);
+      
+      this.tweens.add({
+        targets: particle,
+        alpha: { from: 0.2, to: 0.5 },
+        duration: Phaser.Math.Between(3000, 5000),
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+      
+      this.settingsContainer.add(particle);
     }
   }
   
@@ -642,9 +1014,14 @@ export class MenuScene extends BaseScene {
     this.dungeonsContainer = this.add.container(0, 0);
     this.dungeonsContainer.setVisible(false);
     
-    const title = this.createMenuTitle('SELECT DUNGEON');
+    // Create immersive dungeon background
+    this.createImmersiveDungeonBackground();
     
-    // Dungeon data with lore and stats
+    // Add title
+    const title = this.createMenuTitle('SELECT DUNGEON');
+    this.dungeonsContainer.add(title);
+    
+    // Enhanced dungeon data with visual themes
     const dungeons: DungeonInfo[] = [
       {
         id: 'depths',
@@ -711,105 +1088,28 @@ export class MenuScene extends BaseScene {
     this.dungeonData = dungeons;
     this.dungeonPortraits = [];
 
-    // Layout: Left panel (dungeon list) + Right panel (details)
-    const leftPanelX = GAME_WIDTH / 2 - 190;
-    const rightPanelX = GAME_WIDTH / 2 + 190;
-    const panelY = 280;
-
-    // Left panel - Dungeon list
-    const leftPanelWidth = 180;
-    const leftPanelHeight = 340;
-    const leftPanel = this.add.graphics();
-    leftPanel.fillStyle(0x0a0a1a, 0.9);
-    leftPanel.fillRoundedRect(leftPanelX - leftPanelWidth / 2, panelY - leftPanelHeight / 2, leftPanelWidth, leftPanelHeight, 12);
-    leftPanel.lineStyle(2, 0x4f46e5, 0.4);
-    leftPanel.strokeRoundedRect(leftPanelX - leftPanelWidth / 2, panelY - leftPanelHeight / 2, leftPanelWidth, leftPanelHeight, 12);
-    this.dungeonsContainer.add(leftPanel);
-
-    // Create dungeon list items
-    const listStartY = panelY - leftPanelHeight / 2 + 40;
-    const itemHeight = 75;
-
-    dungeons.forEach((dungeon, index) => {
-      const item = this.createDungeonListItem(dungeon, leftPanelX, listStartY + index * itemHeight);
-      this.dungeonPortraits.push(item);
-      this.dungeonsContainer.add(item);
-    });
-
-    // Right panel - Details
-    const rightPanelWidth = 360;
-    const rightPanelHeight = 340;
-    this.dungeonDetailsContainer = this.add.container(rightPanelX, panelY);
-
-    const rightPanel = this.add.graphics();
-    rightPanel.fillStyle(0x0a0a1a, 0.9);
-    rightPanel.fillRoundedRect(-rightPanelWidth / 2, -rightPanelHeight / 2, rightPanelWidth, rightPanelHeight, 12);
-    rightPanel.lineStyle(2, 0x4f46e5, 0.4);
-    rightPanel.strokeRoundedRect(-rightPanelWidth / 2, -rightPanelHeight / 2, rightPanelWidth, rightPanelHeight, 12);
-
-    // Dungeon name and floors
-    const nameText = this.add.text(0, -rightPanelHeight / 2 + 25, 'The Depths', {
-      fontFamily: 'Arial Black',
-      fontSize: '22px',
-      color: '#ffffff',
-    }).setOrigin(0.5).setName('dungeonName');
-
-    const floorsText = this.add.text(0, -rightPanelHeight / 2 + 52, '5 Floors', {
-      fontFamily: 'Arial',
-      fontSize: '14px',
-      color: '#fbbf24',
-    }).setOrigin(0.5).setName('dungeonFloors');
-
-    // Divider
-    const divider1 = this.add.graphics();
-    divider1.lineStyle(1, 0x374151, 0.6);
-    divider1.beginPath();
-    divider1.moveTo(-rightPanelWidth / 2 + 20, -rightPanelHeight / 2 + 75);
-    divider1.lineTo(rightPanelWidth / 2 - 20, -rightPanelHeight / 2 + 75);
-    divider1.strokePath();
-
-    // Stats section
-    const statsContainer = this.add.container(0, -rightPanelHeight / 2 + 95).setName('dungeonStatsContainer');
-
-    // Lore section
-    const loreLabel = this.add.text(-rightPanelWidth / 2 + 20, 30, 'Lore', {
-      fontFamily: 'Arial Black',
-      fontSize: '12px',
-      color: '#a5b4fc',
-    });
-
-    const loreText = this.add.text(-rightPanelWidth / 2 + 20, 48, 'Dungeon lore...', {
-      fontFamily: 'Arial',
-      fontSize: '11px',
-      color: '#9ca3af',
-      wordWrap: { width: rightPanelWidth - 40 },
-      lineSpacing: 3,
-      align: 'left',
-    }).setName('dungeonLore');
-
-    // Start button
-    const startBtn = this.createDungeonStartButton(rightPanelHeight);
-
-    this.dungeonDetailsContainer.add([
-      rightPanel,
-      nameText,
-      floorsText,
-      divider1,
-      statsContainer,
-      loreLabel,
-      loreText,
-      startBtn,
-    ]);
+    // Create circular dungeon hub layout
+    this.createCircularDungeonHub(dungeons);
+    
+    // Create central detail display
+    this.createCentralDetailDisplay();
+    
+    // Create floating action buttons
+    this.createFloatingActions();
 
     // Back button
     const backBtn = this.createBackButton(() => this.showMenu('main'));
-
-    this.dungeonsContainer.add([title, this.dungeonDetailsContainer, backBtn]);
+    this.dungeonsContainer.add(backBtn);
 
     // Initialize with selected dungeon
     this.showDungeonDetails(this.selectedDungeon, false);
   }
 
+  // ===========================================================================
+  // LEGACY DUNGEON METHODS (unused - replaced by circular hub system)
+  // ===========================================================================
+  
+  /*
   private createDungeonStartButton(panelHeight: number): Phaser.GameObjects.Container {
     const btn = this.add.container(0, panelHeight / 2 - 35);
     const width = 140;
@@ -917,6 +1217,8 @@ export class MenuScene extends BaseScene {
       hitArea.on('pointerdown', () => {
         this.playUISound('click');
         this.showDungeonDetails(dungeon.id);
+        // Add rotation animation to put clicked dungeon at top
+        this.rotateToDungeon(dungeon.id);
       });
 
       container.add(hitArea);
@@ -924,108 +1226,175 @@ export class MenuScene extends BaseScene {
 
     return container;
   }
+  */
 
+  // ===========================================================================
+  // LEGACY ROTATION METHODS (replaced by arc carousel system)
+  // ===========================================================================
+  
+  /*
+  private rotateToDungeon(dungeonId: string): void {
+    const rotatingContainer = this.dungeonsContainer.getByName('rotatingContainer') as Phaser.GameObjects.Container;
+    if (!rotatingContainer) return;
+    
+    const dungeonIndex = this.dungeonData.findIndex(d => d.id === dungeonId);
+    if (dungeonIndex === -1) return;
+    
+    // Calculate target rotation to put selected dungeon at top
+    const dungeonsCount = this.dungeonData.length;
+    const currentAngle = (dungeonIndex / dungeonsCount) * Math.PI * 2 - Math.PI / 2;
+    const targetAngle = -Math.PI / 2; // Top position
+    const rotationNeeded = targetAngle - currentAngle;
+    
+    // Animate rotation
+    this.tweens.add({
+      targets: rotatingContainer,
+      rotation: rotationNeeded,
+      duration: 800,
+      ease: 'Cubic.easeOut',
+      onComplete: () => {
+        // Normalize rotation to prevent buildup
+        rotatingContainer.rotation = Phaser.Math.Wrap(rotatingContainer.rotation, -Math.PI, Math.PI);
+      }
+    });
+  }
+  
+  private rotateToSelectedDungeon(animate: boolean = true): void {
+    const rotatingContainer = this.dungeonsContainer.getByName('rotatingContainer') as Phaser.GameObjects.Container;
+    if (!rotatingContainer) return;
+    
+    const dungeonIndex = this.dungeonData.findIndex(d => d.id === this.selectedDungeon);
+    if (dungeonIndex === -1) return;
+    
+    // Calculate target rotation to put selected dungeon at top
+    const dungeonsCount = this.dungeonData.length;
+    const currentAngle = (dungeonIndex / dungeonsCount) * Math.PI * 2 - Math.PI / 2;
+    const targetAngle = -Math.PI / 2; // Top position
+    const rotationNeeded = targetAngle - currentAngle;
+    
+    if (animate) {
+      // Animate rotation
+      this.tweens.add({
+        targets: rotatingContainer,
+        rotation: rotationNeeded,
+        duration: 800,
+        ease: 'Cubic.easeOut',
+        onComplete: () => {
+          // Normalize rotation to prevent buildup
+          rotatingContainer.rotation = Phaser.Math.Wrap(rotatingContainer.rotation, -Math.PI, Math.PI);
+        }
+      });
+    } else {
+      // Set rotation immediately
+      rotatingContainer.rotation = rotationNeeded;
+    }
+  }
+  */
+  
   private showDungeonDetails(dungeonId: string, animate: boolean = true): void {
-    const previousId = this.selectedDungeon;
     this.selectedDungeon = dungeonId;
     if (!this.dungeonDetailsContainer) return;
     const dungeon = this.dungeonData.find((d) => d.id === dungeonId);
     if (!dungeon) return;
 
-    // Update list item highlights
+    // Update circular node highlights
     this.dungeonPortraits.forEach((item) => {
       const id = item.getData('dungeonId') as string | undefined;
-      const bg = item.getByName('itemBg') as Phaser.GameObjects.Graphics | null;
-      if (!id || !bg) return;
+      const nodeBg = item.getByName('nodeBg') as Phaser.GameObjects.Graphics | null;
+      if (!id || !nodeBg) return;
 
       const data = this.dungeonData.find((d) => d.id === id);
       const unlocked = data?.unlocked ?? false;
       const color = data?.color ?? 0x333333;
       const selected = id === dungeonId;
-      const width = 150;
-      const height = 65;
+      const nodeSize = 60;
 
-      bg.clear();
-      const alpha = selected ? 0.6 : 0.2;
-      const borderAlpha = selected ? 1 : 0.5;
-      bg.fillStyle(unlocked ? color : 0x333333, alpha);
-      bg.fillRoundedRect(-width / 2, -height / 2, width, height, 8);
-      bg.lineStyle(selected ? 2 : 1, unlocked ? color : 0x444444, borderAlpha);
-      bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 8);
+      nodeBg.clear();
+      const alpha = selected ? 1 : 0.6;
+      const scale = selected ? 1.1 : 1;
+      const actualSize = (nodeSize / 2) * scale;
+
+      if (unlocked) {
+        nodeBg.fillStyle(color, alpha);
+        nodeBg.fillCircle(0, 0, actualSize);
+        nodeBg.lineStyle(selected ? 3 : 2, 0xffffff, selected ? 0.8 : 0.4);
+      } else {
+        nodeBg.fillStyle(0x333333, alpha);
+        nodeBg.fillCircle(0, 0, actualSize);
+        nodeBg.lineStyle(2, 0x666666, 0.4);
+      }
+      nodeBg.strokeCircle(0, 0, actualSize);
     });
 
     // Detail panel elements
     const nameText = this.dungeonDetailsContainer.getByName('dungeonName') as Phaser.GameObjects.Text | null;
-    const floorsText = this.dungeonDetailsContainer.getByName('dungeonFloors') as Phaser.GameObjects.Text | null;
     const loreText = this.dungeonDetailsContainer.getByName('dungeonLore') as Phaser.GameObjects.Text | null;
     const statsContainer = this.dungeonDetailsContainer.getByName('dungeonStatsContainer') as Phaser.GameObjects.Container | null;
 
     const applyContent = () => {
       if (nameText) {
         nameText.setText(dungeon.name);
-      }
-
-      if (floorsText) {
-        floorsText.setText(`${dungeon.floors} Floors`);
+        nameText.setColor(`#${dungeon.color.toString(16).padStart(6, '0')}`);
       }
 
       if (loreText) {
         loreText.setText(dungeon.lore);
       }
 
-      // Render stats
+      // Clear and render stats
       if (statsContainer) {
         statsContainer.removeAll(true);
-        const rightPanelWidth = 340;
-        let yOffset = 0;
-        const lineHeight = 18;
+        
+        const panelWidth = 500;
+        let xOffset = -panelWidth / 2 + 20;
+        const yOffset = 0;
+        const spacing = 120;
 
         dungeon.stats.forEach((stat) => {
           const [label, value] = stat.split(': ');
 
-          const labelText = this.add.text(-rightPanelWidth / 2 + 20, yOffset, label + ':', {
+          const labelText = this.add.text(xOffset, yOffset, label + ':', {
             fontFamily: 'Arial',
             fontSize: '11px',
+            color: '#a5b4fc',
+          });
+
+          const valueText = this.add.text(xOffset, yOffset + 14, value, {
+            fontFamily: 'Arial',
+            fontSize: '10px',
             color: '#9ca3af',
           });
-          statsContainer.add(labelText);
 
-          const starCount = (value.match(/★/g) || []).length;
-          const maxStars = 5;
-
-          if (starCount > 0) {
-            // Difficulty bar
-            const barWidth = 60;
+          // Difficulty stars bar
+          if (label === 'Difficulty') {
+            const barWidth = 80;
             const barHeight = 8;
-            const barX = 40;
+            const barX = xOffset + 70;
+            const barY = yOffset + 8;
 
             const barBg = this.add.graphics();
-            barBg.fillStyle(0x1f2937, 1);
-            barBg.fillRoundedRect(barX, yOffset + 2, barWidth, barHeight, 3);
+            barBg.fillStyle(0x374151, 0.5);
+            barBg.fillRoundedRect(barX, barY, barWidth, barHeight, 4);
+
+            const starCount = (value.match(/★/g) || []).length;
+            const maxStars = 5;
+            const fillWidth = (starCount / maxStars) * barWidth;
 
             const barFill = this.add.graphics();
-            const fillWidth = (starCount / maxStars) * barWidth;
             barFill.fillStyle(dungeon.color, 1);
-            barFill.fillRoundedRect(barX, yOffset + 2, fillWidth, barHeight, 3);
+            barFill.fillRoundedRect(barX, barY, fillWidth, barHeight, 4);
 
             statsContainer.add([barBg, barFill]);
-          } else {
-            const valueText = this.add.text(40, yOffset, value, {
-              fontFamily: 'Arial',
-              fontSize: '11px',
-              color: '#e5e7eb',
-              wordWrap: { width: 140 },
-            });
-            statsContainer.add(valueText);
           }
 
-          yOffset += lineHeight;
+          statsContainer.add([labelText, valueText]);
+          xOffset += spacing;
         });
       }
     };
 
     // Animate panel content
-    if (animate && previousId !== dungeonId) {
+    if (animate) {
       this.tweens.add({
         targets: this.dungeonDetailsContainer,
         alpha: 0,
@@ -1036,14 +1405,13 @@ export class MenuScene extends BaseScene {
           this.tweens.add({
             targets: this.dungeonDetailsContainer,
             alpha: 1,
-            duration: 150,
+            duration: 200,
             ease: 'Quad.easeOut',
           });
         },
       });
     } else {
       applyContent();
-      this.dungeonDetailsContainer.setAlpha(1);
     }
   }
   
@@ -1054,6 +1422,9 @@ export class MenuScene extends BaseScene {
   private createCharactersMenu(): void {
     this.charactersContainer = this.add.container(0, 0);
     this.charactersContainer.setVisible(false);
+    
+    // Add enhanced background
+    this.createCharactersMenuBackground();
     
     const title = this.createMenuTitle('SELECT CHARACTER');
     
@@ -1490,6 +1861,9 @@ export class MenuScene extends BaseScene {
     this.achievementsContainer = this.add.container(0, 0);
     this.achievementsContainer.setVisible(false);
     
+    // Add enhanced background
+    this.createAchievementsMenuBackground();
+    
     const title = this.createMenuTitle('ACHIEVEMENTS');
     
     // Achievement data (sample)
@@ -1580,6 +1954,9 @@ export class MenuScene extends BaseScene {
   private createSettingsMenu(): void {
     this.settingsContainer = this.add.container(0, 0);
     this.settingsContainer.setVisible(false);
+    
+    // Add enhanced background
+    this.createSettingsMenuBackground();
     
     const title = this.createMenuTitle('SETTINGS');
     
@@ -1957,6 +2334,426 @@ export class MenuScene extends BaseScene {
     return container;
   }
   
+  /**
+   * Create arc-based dungeon carousel with drag scrolling
+   */
+  private createCircularDungeonHub(dungeons: DungeonInfo[]): void {
+    const arcCenterX = GAME_WIDTH / 2;
+    const arcCenterY = 420; // Arc center positioned to create rainbow effect at top
+    const arcRadius = 250;
+    
+    // Store carousel state
+    this.carouselOffset = 0;
+    this.carouselDragging = false;
+    this.carouselVelocity = 0;
+    
+    // Create arc path visualization
+    const arcPath = this.add.graphics();
+    arcPath.lineStyle(2, 0x4f46e5, 0.2);
+    arcPath.beginPath();
+    // Arc from -PI/2 - 0.4*PI to -PI/2 + 0.4*PI (centered at top)
+    arcPath.arc(arcCenterX, arcCenterY, arcRadius, Math.PI * 1.1, Math.PI * 1.9, false);
+    arcPath.strokePath();
+    this.dungeonsContainer.add(arcPath);
+    
+    // Create carousel container (not rotating - we'll move nodes individually)
+    const carouselContainer = this.add.container(0, 0);
+    carouselContainer.setName('carouselContainer');
+    
+    // Create dungeon nodes along the arc
+    dungeons.forEach((dungeon, index) => {
+      const node = this.createArcDungeonNode(dungeon, index);
+      this.dungeonPortraits.push(node);
+      carouselContainer.add(node);
+    });
+    
+    this.dungeonsContainer.add(carouselContainer);
+    
+    // Setup drag interaction
+    this.setupCarouselDrag(arcCenterX, arcCenterY, arcRadius, dungeons.length);
+    
+    // Initial position update
+    this.updateCarouselPositions(arcCenterX, arcCenterY, arcRadius, dungeons.length);
+  }
+  
+  /**
+   * Create a dungeon node for the arc carousel (always upright)
+   */
+  private createArcDungeonNode(dungeon: DungeonInfo, index: number): Phaser.GameObjects.Container {
+    const container = this.add.container(0, 0);
+    container.setData('dungeonId', dungeon.id);
+    container.setData('index', index);
+    
+    const nodeSize = 70;
+    const isSelected = dungeon.id === this.selectedDungeon;
+    
+    // Outer glow effect
+    const glow = this.add.graphics().setName('glow');
+    if (dungeon.unlocked) {
+      glow.fillStyle(dungeon.color, 0.3);
+      glow.fillCircle(0, 0, nodeSize / 2 + 12);
+    }
+    
+    // Main node circle
+    const nodeBg = this.add.graphics().setName('nodeBg');
+    this.drawArcNode(nodeBg, dungeon, nodeSize, isSelected, false);
+    
+    // Dungeon icon
+    const icons: Record<string, string> = {
+      depths: '🏰',
+      crypt: '💀',
+      volcano: '🔥',
+      frost: '❄️'
+    };
+    
+    const icon = this.add.text(0, -5, dungeon.unlocked ? (icons[dungeon.id] || '?') : '🔒', {
+      fontSize: '28px',
+    }).setOrigin(0.5).setName('icon');
+    
+    // Dungeon name below node (always upright)
+    const name = this.add.text(0, nodeSize / 2 + 12, dungeon.name, {
+      fontFamily: 'Arial Black',
+      fontSize: '11px',
+      color: dungeon.unlocked ? '#ffffff' : '#666666',
+    }).setOrigin(0.5).setName('name');
+    
+    // Floor count
+    const floors = this.add.text(0, nodeSize / 2 + 26, `${dungeon.floors} Floors`, {
+      fontFamily: 'Arial',
+      fontSize: '9px',
+      color: dungeon.unlocked ? '#9ca3af' : '#4b5563',
+    }).setOrigin(0.5).setName('floors');
+    
+    container.add([glow, nodeBg, icon, name, floors]);
+    
+    // Interactivity
+    if (dungeon.unlocked) {
+      const hitArea = this.add.circle(0, 0, nodeSize / 2 + 15, 0x000000, 0)
+        .setInteractive({ useHandCursor: true });
+      
+      // Set high depth to ensure it's above the drag zone
+      hitArea.setDepth(200);
+      
+      hitArea.on('pointerover', () => {
+        if (dungeon.id !== this.selectedDungeon) {
+          this.drawArcNode(nodeBg, dungeon, nodeSize, false, true);
+          this.playUISound('hover');
+        }
+      });
+      
+      hitArea.on('pointerout', () => {
+        this.drawArcNode(nodeBg, dungeon, nodeSize, dungeon.id === this.selectedDungeon, false);
+      });
+      
+      hitArea.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+        // Stop propagation to prevent drag zone from catching this
+        pointer.event.stopPropagation();
+        this.playUISound('click');
+        this.scrollToCarouselIndex(container.getData('index') as number);
+      });
+      
+      container.add(hitArea);
+    }
+    
+    return container;
+  }
+  
+  /**
+   * Draw arc node graphics
+   */
+  private drawArcNode(graphics: Phaser.GameObjects.Graphics, dungeon: DungeonInfo, nodeSize: number, selected: boolean, hover: boolean): void {
+    graphics.clear();
+    const alpha = selected ? 1 : (hover ? 0.85 : 0.7);
+    const scale = selected ? 1.15 : (hover ? 1.08 : 1);
+    const actualSize = (nodeSize / 2) * scale;
+    
+    if (dungeon.unlocked) {
+      graphics.fillStyle(dungeon.color, alpha);
+      graphics.fillCircle(0, 0, actualSize);
+      graphics.lineStyle(selected ? 4 : 2, 0xffffff, selected ? 0.9 : 0.5);
+    } else {
+      graphics.fillStyle(0x333333, alpha);
+      graphics.fillCircle(0, 0, actualSize);
+      graphics.lineStyle(2, 0x666666, 0.4);
+    }
+    graphics.strokeCircle(0, 0, actualSize);
+  }
+  
+  /**
+   * Setup carousel drag interaction
+   */
+  private setupCarouselDrag(centerX: number, centerY: number, radius: number, count: number): void {
+    // Create invisible drag zone covering the arc area (lower depth than nodes)
+    const dragZone = this.add.rectangle(centerX, centerY - radius + 50, GAME_WIDTH - 100, 200, 0x000000, 0)
+      .setInteractive({ draggable: true })
+      .setDepth(50); // Lower depth than dungeon nodes
+    
+    let startX = 0;
+    let startOffset = 0;
+    
+    dragZone.on('dragstart', (pointer: Phaser.Input.Pointer) => {
+      this.carouselDragging = true;
+      this.carouselVelocity = 0;
+      startX = pointer.x;
+      startOffset = this.carouselOffset;
+    });
+    
+    dragZone.on('drag', (pointer: Phaser.Input.Pointer) => {
+      const deltaX = pointer.x - startX;
+      // Convert pixel drag to carousel offset (higher sensitivity for better control)
+      this.carouselOffset = startOffset - deltaX * 0.008;
+      this.updateCarouselPositions(centerX, centerY, radius, count);
+    });
+    
+    dragZone.on('dragend', (_pointer: Phaser.Input.Pointer) => {
+      this.carouselDragging = false;
+      // Stop any momentum and snap immediately to nearest dungeon
+      this.carouselVelocity = 0;
+      this.snapToNearestDungeon(count);
+    });
+    
+    this.dungeonsContainer.add(dragZone);
+  }
+  
+  /**
+   * Update positions of all carousel nodes
+   */
+  private updateCarouselPositions(centerX: number, centerY: number, radius: number, count: number): void {
+    const arcSpan = Math.PI * 0.8; // Arc spans about 144 degrees
+    const spacing = arcSpan / Math.max(count - 1, 1); // Space between each dungeon
+    
+    this.dungeonPortraits.forEach((node, index) => {
+      // Calculate how far this node is from the current carousel position
+      let offset = index - this.carouselOffset;
+      
+      // Wrap around for infinite scrolling
+      while (offset > count / 2) offset -= count;
+      while (offset < -count / 2) offset += count;
+      
+      // Position along arc - offset 0 means top center
+      const angleOffset = offset * spacing;
+      const angle = -Math.PI / 2 + angleOffset; // -PI/2 is top center
+      
+      const x = centerX + Math.cos(angle) * radius;
+      const y = centerY + Math.sin(angle) * radius;
+      
+      node.setPosition(x, y);
+      
+      // Scale based on distance from center (center = largest)
+      const distanceFromCenter = Math.abs(offset);
+      const scale = 1.1 - distanceFromCenter * 0.2;
+      node.setScale(Math.max(0.6, Math.min(1.1, scale)));
+      
+      // Alpha based on distance from center
+      const alpha = 1 - distanceFromCenter * 0.25;
+      node.setAlpha(Math.max(0.4, alpha));
+      
+      // Depth sorting - center items on top (base depth above drag zone)
+      node.setDepth(150 - Math.abs(offset) * 10);
+      
+      // Update selection visual if this is the centered dungeon
+      const isCentered = Math.abs(offset) < 0.4;
+      const dungeonId = node.getData('dungeonId') as string;
+      const dungeon = this.dungeonData.find(d => d.id === dungeonId);
+      const nodeBg = node.getByName('nodeBg') as Phaser.GameObjects.Graphics;
+      
+      if (dungeon && nodeBg) {
+        this.drawArcNode(nodeBg, dungeon, 70, isCentered, false);
+      }
+      
+      // Update selected dungeon when centered
+      if (isCentered && dungeonId !== this.selectedDungeon) {
+        this.selectedDungeon = dungeonId;
+        this.updateDungeonDetailsPanel();
+      }
+    });
+  }
+  
+  /**
+   * Snap carousel to nearest dungeon
+   */
+  private snapToNearestDungeon(_count: number): void {
+    const nearestIndex = Math.round(this.carouselOffset);
+    this.scrollToCarouselIndex(nearestIndex);
+  }
+  
+  /**
+   * Scroll carousel to specific index with animation
+   */
+  private scrollToCarouselIndex(targetIndex: number): void {
+    const arcCenterX = GAME_WIDTH / 2;
+    const arcCenterY = 420;
+    const arcRadius = 250;
+    const count = this.dungeonData.length;
+    
+    // Animate to target
+    this.tweens.add({
+      targets: this,
+      carouselOffset: targetIndex,
+      duration: 400,
+      ease: 'Cubic.easeOut',
+      onUpdate: () => {
+        this.updateCarouselPositions(arcCenterX, arcCenterY, arcRadius, count);
+      },
+      onComplete: () => {
+        // Update selection
+        const targetDungeon = this.dungeonData[((targetIndex % count) + count) % count];
+        if (targetDungeon) {
+          this.selectedDungeon = targetDungeon.id;
+          this.showDungeonDetails(targetDungeon.id, true);
+        }
+      }
+    });
+  }
+  
+  /**
+   * Update dungeon details panel without animation
+   */
+  private updateDungeonDetailsPanel(): void {
+    if (!this.dungeonDetailsContainer) return;
+    const dungeon = this.dungeonData.find(d => d.id === this.selectedDungeon);
+    if (!dungeon) return;
+    
+    const nameText = this.dungeonDetailsContainer.getByName('dungeonName') as Phaser.GameObjects.Text;
+    const loreText = this.dungeonDetailsContainer.getByName('dungeonLore') as Phaser.GameObjects.Text;
+    
+    if (nameText) nameText.setText(dungeon.name);
+    if (loreText) loreText.setText(dungeon.lore);
+  }
+  
+  /**
+   * Create central detail display
+   */
+  private createCentralDetailDisplay(): void {
+    const centerX = GAME_WIDTH / 2;
+    const centerY = 480; // Positioned below the arc carousel
+    
+    this.dungeonDetailsContainer = this.add.container(centerX, centerY);
+    
+    const panelWidth = 600;
+    const panelHeight = 140;
+    
+    // Glass-morphism panel
+    const panel = this.add.graphics();
+    panel.fillStyle(0x0a0a1a, 0.7);
+    panel.fillRoundedRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight, 16);
+    panel.lineStyle(1, 0x4f46e5, 0.3);
+    panel.strokeRoundedRect(-panelWidth / 2, -panelHeight / 2, panelWidth, panelHeight, 16);
+    
+    // Dungeon name
+    const nameText = this.add.text(0, -panelHeight / 2 + 25, 'The Depths', {
+      fontFamily: 'Arial Black',
+      fontSize: '20px',
+      color: '#ffffff',
+    }).setOrigin(0.5).setName('dungeonName');
+    
+    // Lore text
+    const loreText = this.add.text(0, 5, 'Dungeon lore...', {
+      fontFamily: 'Arial',
+      fontSize: '12px',
+      color: '#9ca3af',
+      wordWrap: { width: panelWidth - 40 },
+      lineSpacing: 2,
+      align: 'center',
+    }).setOrigin(0.5).setName('dungeonLore');
+    
+    // Stats container
+    const statsContainer = this.add.container(0, 40).setName('dungeonStatsContainer');
+    
+    this.dungeonDetailsContainer.add([panel, nameText, loreText, statsContainer]);
+    this.dungeonsContainer.add(this.dungeonDetailsContainer);
+  }
+  
+  /**
+   * Create floating action buttons
+   */
+  private createFloatingActions(): void {
+    const centerX = GAME_WIDTH / 2;
+    const bottomY = 620; // Position below detail panel
+    
+    // Start button with enhanced design
+    const startBtn = this.createFloatingButton(centerX, bottomY, 'BEGIN QUEST', 0x22c55e, () => {
+      this.playUISound('click');
+      this.startGame(false);
+    });
+    startBtn.setName('startButton');
+    
+    this.dungeonsContainer.add(startBtn);
+  }
+  
+  /**
+   * Create floating button with glass effect
+   */
+  private createFloatingButton(x: number, y: number, text: string, color: number, callback: () => void): Phaser.GameObjects.Container {
+    const btn = this.add.container(x, y);
+    const width = 180;
+    const height = 45;
+    
+    // Glass-morphism background
+    const bg = this.add.graphics();
+    bg.fillStyle(color, 0.8);
+    bg.fillRoundedRect(-width / 2, -height / 2, width, height, 12);
+    bg.lineStyle(1, 0xffffff, 0.3);
+    bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 12);
+    
+    // Button text
+    const textObj = this.add.text(0, 0, text, {
+      fontFamily: 'Arial Black',
+      fontSize: '16px',
+      color: '#ffffff',
+    }).setOrigin(0.5);
+    
+    // Hover effect
+    const hitArea = this.add.rectangle(0, 0, width, height, 0x000000, 0)
+      .setInteractive({ useHandCursor: true });
+    
+    hitArea.on('pointerover', () => {
+      bg.clear();
+      bg.fillStyle(color, 1);
+      bg.fillRoundedRect(-width / 2, -height / 2, width, height, 12);
+      bg.lineStyle(2, 0xffffff, 0.5);
+      bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 12);
+      
+      this.tweens.add({
+        targets: btn,
+        scale: 1.05,
+        duration: 150,
+        ease: 'Quad.easeOut'
+      });
+    });
+    
+    hitArea.on('pointerout', () => {
+      bg.clear();
+      bg.fillStyle(color, 0.8);
+      bg.fillRoundedRect(-width / 2, -height / 2, width, height, 12);
+      bg.lineStyle(1, 0xffffff, 0.3);
+      bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 12);
+      
+      this.tweens.add({
+        targets: btn,
+        scale: 1,
+        duration: 150,
+        ease: 'Quad.easeOut'
+      });
+    });
+    
+    hitArea.on('pointerdown', callback);
+    
+    btn.add([bg, textObj, hitArea]);
+    
+    // Floating animation
+    this.tweens.add({
+      targets: btn,
+      y: y - 5,
+      duration: 2000,
+      ease: 'Sine.easeInOut',
+      yoyo: true,
+      repeat: -1
+    });
+    
+    return btn;
+  }
+  
   private showMenu(state: MenuState): void {
     // Hide all menus
     this.mainContainer.setVisible(false);
@@ -1987,7 +2784,8 @@ export class MenuScene extends BaseScene {
       ease: 'Power2',
     });
     
-    this.currentState = state;
+    // Note: currentState assignment removed as property is unused
+    // this.currentState = state;
   }
   
   private startGame(continueRun: boolean): void {
